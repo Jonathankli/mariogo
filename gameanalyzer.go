@@ -10,11 +10,13 @@ import (
 )
 
 const (
-	idle       = iota
-	loading    = iota
-	racing     = iota
-	results    = iota
-	endResults = iota
+	idle          = iota
+	loading       = iota
+	racing        = iota
+	pause         = iota
+	roundResults  = iota
+	interimResult = iota
+	endResults    = iota
 )
 
 type GameAnalyzer struct {
@@ -71,15 +73,16 @@ func NewGameAnalyzer() *GameAnalyzer {
 }
 
 func (ga *GameAnalyzer) Run() {
+	fmt.Println("Start!")
 	for {
-		startTime := time.Now()
+		// startTime := time.Now()
 		frame := ga.GetCurrentFrame()
 
 		// gocv.IMWrite(fmt.Sprintf("images/frame_%v.png", ga.frame), frame)
 		// ga.frame++
 
 		ga.updateState(frame)
-		fmt.Println("Time:", time.Since(startTime))
+		// fmt.Println("Time:", time.Since(startTime))
 
 		time.Sleep(500 * time.Millisecond)
 	}
@@ -131,54 +134,64 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 	newState := ga.state
 
 	switch ga.state {
-	case idle:
-		player := 0
-		if ga.Matches(frame, NewRound1Player) {
-			player = 1
-		} else if ga.Matches(frame, NewRound2Player) {
-			player = 2
-		} else if ga.Matches(frame, NewRound4Player) {
-			player = 4
-		} else if ga.Matches(frame, NewRound3Or4Player) {
-			player = 3
-		}
-
-		if player > 0 {
-			newState = racing
+	case idle: // -> loading
+		if started, player := ga.gameStarted(frame, newState); started {
 			ga.playerCount = player
 			ga.currentRound = 1
-			fmt.Println("Player ", player, " detected")
+			newState = racing
+			fmt.Println("Game started with", player, "players")
 		}
 	case loading:
 		// TODO
-	case racing: // -> results || endResults
-		placements, ok := ga.GetRoundResult(frame)
+	case racing: // -> pause
+		if !ga.isRacing(frame, newState) {
+			newState = pause
+			fmt.Println("Game paused")
+		}
+	case pause: // -> roundResults | racing
+		// back to racing
+		if ga.isRacing(frame, newState) {
+			newState = racing
+			fmt.Println("Game resumed")
+		}
+
+		// round results
+		placements, ok := ga.getRoundResult(frame)
 		if ok {
 			fmt.Println("Round results:", placements)
-			newState = results
+			newState = roundResults
 		}
-
-		if ga.Matches(frame, EndResults) {
-			newState = endResults
-		}
-	case results:
-		// restart round
-		newRound := false
-		if ga.playerCount == 1 && ga.Matches(frame, NewRound1Player) {
-			newRound = true
-		} else if ga.playerCount == 2 && ga.Matches(frame, NewRound2Player) {
-			newRound = true
-		} else if (ga.playerCount == 3 || ga.playerCount == 4) && ga.Matches(frame, NewRound3Or4Player) {
-			newRound = true
-		}
-
-		if newRound {
+	case roundResults: // -> inertimResult | racing
+		// new round
+		if ga.isRacing(frame, newState) {
 			newState = racing
 			ga.currentRound++
 			fmt.Println("New round started")
 		}
+
+		// interim results
+		if results, ok := ga.getInterimResults(frame); ok {
+			newState = interimResult
+			fmt.Println("Interim results:", results)
+		}
+
+	case interimResult: // -> racing | endResults
+
+		// new round
+		if ga.isRacing(frame, newState) {
+			newState = racing
+			ga.currentRound++
+			fmt.Println("New round started")
+		}
+
+		// end results
+		if ga.Matches(frame, EndResults) {
+			newState = endResults
+		}
+
 	case endResults:
-		// newState = idle
+		// TODO
+		newState = idle
 	}
 
 	if newState != ga.state {
@@ -189,7 +202,37 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 	}
 }
 
-func (ga *GameAnalyzer) GetRoundResult(frame gocv.Mat) ([4]int, bool) {
+func (ga *GameAnalyzer) gameStarted(frame gocv.Mat, state int) (bool, int) {
+	player := 0
+	if ga.Matches(frame, OnePlayerPlaying) {
+		player = 1
+	} else if ga.Matches(frame, TwoPlayerPlaying) {
+		player = 2
+	} else if ga.Matches(frame, FourPlayerPlaying) {
+		player = 4
+	} else if ga.Matches(frame, ThreePlayerPlaying) {
+		player = 3
+	}
+
+	return player > 0, player
+}
+
+func (ga *GameAnalyzer) isRacing(frame gocv.Mat, state int) bool {
+
+	if ga.playerCount == 1 && ga.Matches(frame, OnePlayerPlaying) {
+		return true
+	} else if ga.playerCount == 2 && ga.Matches(frame, TwoPlayerPlaying) {
+		return true
+	} else if ga.playerCount == 3 && ga.Matches(frame, ThreePlayerPlaying) {
+		return true
+	} else if ga.playerCount == 1 && ga.Matches(frame, FourPlayerPlaying) {
+		return true
+	}
+
+	return false
+}
+
+func (ga *GameAnalyzer) getRoundResult(frame gocv.Mat) ([4]int, bool) {
 
 	colors := [4]color.RGBA{
 		color.RGBA{250, 229, 38, 255},  //P1
@@ -247,9 +290,15 @@ func (ga *GameAnalyzer) GetRoundResult(frame gocv.Mat) ([4]int, bool) {
 
 	ok := foundPlayer == ga.playerCount
 
-	// if ok && ga.currentRound > 1 {
-	// 	ok = ga.Matches(frame, NeutralResultP1) || ga.Matches(frame, PositiveResultP1) || ga.Matches(frame, NegativeResultP1)
-	// }
-
 	return placements, ok
+}
+
+func (ga *GameAnalyzer) getInterimResults(frame gocv.Mat) ([4]int, bool) {
+	results, ok := ga.getRoundResult(frame)
+
+	if ok {
+		ok = ga.Matches(frame, NeutralResultP1) || ga.Matches(frame, PositiveResultP1) || ga.Matches(frame, NegativeResultP1)
+	}
+
+	return results, ok
 }
