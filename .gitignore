@@ -1,3 +1,4 @@
 /images
 /stateChanges
 .vscode
+.env

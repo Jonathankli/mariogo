@@ -22,38 +22,19 @@ const (
 type GameAnalyzer struct {
 	state          int
 	stateUpdatedAt time.Time
-	players        []Player
-	rounds         []Round
+	gameModel      Game
 	webcam         *gocv.VideoCapture
 	frame          int
 	currentRound   int
 	playerCount    int
 	running        bool
-}
-
-type Player struct {
-	position  int
-	character string
-}
-
-type Round struct {
-	number     int
-	trackName  string
-	placements []struct {
-		player   *Player
-		position int
-	}
+	observer       *GameObserver
 }
 
 type Pixel struct {
 	x int
 	y int
 	c color.RGBA
-}
-
-type Point struct {
-	x int
-	y int
 }
 
 func NewGameAnalyzer() *GameAnalyzer {
@@ -146,6 +127,15 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 			ga.playerCount = player
 			ga.currentRound = 1
 			newState = racing
+			ga.observer = NewGameObserver()
+
+			player := []string{}
+			for i := 0; i < ga.playerCount; i++ {
+				player = append(player, fmt.Sprintf("Player %v", i+1))
+			}
+			ga.observer.InitPlayer(player)
+			ga.observer.NewRound(ga.currentRound, nil)
+
 			fmt.Println("Game started with", player, "players")
 		}
 	case loading:
@@ -166,6 +156,7 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 		placements, ok := ga.getRoundResult(frame)
 		if ok {
 			fmt.Println("Round results:", placements)
+			ga.observer.RoundResults(placements)
 			newState = roundResults
 		}
 	case roundResults: // -> inertimResult | racing
@@ -173,12 +164,14 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 		if ga.isRacing(frame, newState) {
 			newState = racing
 			ga.currentRound++
+			ga.observer.NewRound(ga.currentRound, nil)
 			fmt.Println("New round started")
 		}
 
 		// interim results
 		if results, ok := ga.getInterimResults(frame); ok {
 			newState = interimResult
+			ga.observer.InterimResults(results)
 			fmt.Println("Interim results:", results)
 		}
 
@@ -188,6 +181,7 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 		if ga.isRacing(frame, newState) {
 			newState = racing
 			ga.currentRound++
+			ga.observer.NewRound(ga.currentRound, nil)
 			fmt.Println("New round started")
 		}
 
@@ -199,6 +193,7 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 	case endResults:
 		// TODO
 		fmt.Println("Game ended")
+		ga.observer.Finish()
 		newState = idle
 	}
 
