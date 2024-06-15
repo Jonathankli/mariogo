@@ -28,6 +28,7 @@ type GameAnalyzer struct {
 	frame          int
 	currentRound   int
 	playerCount    int
+	running        bool
 }
 
 type Player struct {
@@ -61,20 +62,24 @@ func NewGameAnalyzer() *GameAnalyzer {
 		panic("Error opening video capture device: 0")
 	}
 
-	// defer webcam.Close()
-
 	return &GameAnalyzer{
 		state:        idle,
 		webcam:       webcam,
 		frame:        0,
 		playerCount:  0,
 		currentRound: 0,
+		running:      true,
 	}
+}
+
+func (ga *GameAnalyzer) Stop() {
+	ga.running = false
+	defer ga.webcam.Close()
 }
 
 func (ga *GameAnalyzer) Run() {
 	fmt.Println("Start!")
-	for {
+	for ga.running {
 		// startTime := time.Now()
 		frame := ga.GetCurrentFrame()
 
@@ -82,6 +87,8 @@ func (ga *GameAnalyzer) Run() {
 		// ga.frame++
 
 		ga.updateState(frame)
+		frame.Close()
+
 		// fmt.Println("Time:", time.Since(startTime))
 
 		time.Sleep(500 * time.Millisecond)
@@ -191,6 +198,7 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 
 	case endResults:
 		// TODO
+		fmt.Println("Game ended")
 		newState = idle
 	}
 
