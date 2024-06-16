@@ -1,6 +1,8 @@
 package main
 
 import (
+	"jkli/mariogo/mariogo"
+
 	"github.com/joho/godotenv"
 )
 
@@ -12,15 +14,15 @@ func main() {
 		panic("Error loading .env file")
 	}
 
-	DatabaseConnect()
+	mariogo.DatabaseConnect()
 
-	// DB.AutoMigrate(&Game{}, &Round{}, &Character{}, &Person{}, &Player{}, &RoundPlacement{}, &Placement{})
+	// mariogo.DB.AutoMigrate(&Game{}, &Round{}, &Character{}, &Person{}, &Player{}, &RoundPlacement{}, &Placement{})
 
-	// SeedCharacter()
+	// mariogo.SeedCharacter()
 
-	ga := NewGameAnalyzer()
+	ga := mariogo.NewGameAnalyzer()
 
-	go runWebServer()
+	go mariogo.RunWebServer()
 
 	ga.Run()
 

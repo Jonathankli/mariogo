@@ -1,4 +1,4 @@
-package main
+package mariogo
 
 var characters []Character = []Character{
 	{Name: "Mario", Weight: "Medium-Heavy"},

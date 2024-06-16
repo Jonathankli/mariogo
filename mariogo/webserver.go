@@ -1,8 +1,8 @@
-package main
+package mariogo
 
 import "github.com/gin-gonic/gin"
 
-func runWebServer() {
+func RunWebServer() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 

@@ -1,4 +1,4 @@
-package main
+package mariogo
 
 import "gorm.io/gorm/clause"
 
