@@ -237,6 +237,11 @@ func (ga *GameAnalyzer) isRacing(frame gocv.Mat, state int) bool {
 
 func (ga *GameAnalyzer) getRoundResult(frame gocv.Mat) ([4]int, bool) {
 
+	if ga.playerCount == 1 {
+		position, ok := ga.getRoundResultOnePlayer(frame)
+		return [4]int{position, 0, 0, 0}, ok
+	}
+
 	colors := [4]color.RGBA{
 		color.RGBA{250, 229, 38, 255},  //P1
 		color.RGBA{33, 229, 251, 255},  //P2
@@ -296,7 +301,50 @@ func (ga *GameAnalyzer) getRoundResult(frame gocv.Mat) ([4]int, bool) {
 	return placements, ok
 }
 
+func (ga *GameAnalyzer) getRoundResultOnePlayer(frame gocv.Mat) (int, bool) {
+
+	color := color.RGBA{250, 229, 38, 255} //P1
+
+	placement := 0
+
+	rowDistance := 75
+	row := [6]Pixel{
+		Pixel{x: 840, y: 100, c: color},
+		Pixel{x: 840, y: 155, c: color},
+		Pixel{x: 1790, y: 155, c: color},
+		Pixel{x: 1790, y: 100, c: color},
+		Pixel{x: 1310, y: 100, c: color},
+		Pixel{x: 1310, y: 155, c: color},
+	}
+
+	for i := 0; i < 12; i++ {
+
+		if ga.Matches(frame, row[:]) {
+			placement = i + 1
+			break
+		}
+
+		row[0].y += rowDistance
+		row[1].y += rowDistance
+		row[2].y += rowDistance
+		row[3].y += rowDistance
+		row[4].y += rowDistance
+		row[5].y += rowDistance
+
+	}
+
+	ok := placement > 0
+
+	return placement, ok
+}
+
 func (ga *GameAnalyzer) getInterimResults(frame gocv.Mat) ([4]int, bool) {
+
+	if ga.playerCount == 1 {
+		position, ok := ga.getInterimResultOnePlayer(frame)
+		return [4]int{position, 0, 0, 0}, ok
+	}
+
 	results, ok := ga.getRoundResult(frame)
 
 	if ok {
@@ -304,4 +352,29 @@ func (ga *GameAnalyzer) getInterimResults(frame gocv.Mat) ([4]int, bool) {
 	}
 
 	return results, ok
+}
+
+func (ga *GameAnalyzer) getInterimResultOnePlayer(frame gocv.Mat) (int, bool) {
+	result, ok := ga.getRoundResultOnePlayer(frame)
+
+	if ok {
+		xOffset := 360
+
+		neutral := ga.addOffset(NeutralResultP1, xOffset, 0)
+		positive := ga.addOffset(PositiveResultP1, xOffset, 0)
+		negative := ga.addOffset(NegativeResultP1, xOffset, 0)
+
+		ok = ga.Matches(frame, neutral) || ga.Matches(frame, positive) || ga.Matches(frame, negative)
+	}
+
+	return result, ok
+}
+
+func (ga *GameAnalyzer) addOffset(pixels []Pixel, x int, y int) []Pixel {
+	for i := range pixels {
+		pixels[i].x += x
+		pixels[i].y += y
+	}
+
+	return pixels
 }
