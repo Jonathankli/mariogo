@@ -40,12 +40,14 @@ type Placement struct {
 
 type Player struct {
 	gorm.Model
-	Number   int
-	Name     string
-	Game     Game
-	GameID   uint
-	Person   *Person
-	PersonID *uint
+	Number       int
+	Game         Game
+	GameID       uint
+	FallbackName *string
+	Character    *Character
+	CharacterID  *uint
+	Person       *Person
+	PersonID     *uint
 }
 
 type Character struct {

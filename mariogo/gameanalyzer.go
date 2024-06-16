@@ -2,10 +2,12 @@ package mariogo
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"time"
 
 	"github.com/lucasb-eyer/go-colorful"
+	"github.com/otiai10/gosseract/v2"
 	"gocv.io/x/gocv"
 )
 
@@ -127,13 +129,7 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 			ga.playerCount = player
 			ga.currentRound = 1
 			newState = racing
-			ga.observer = NewGameObserver()
-
-			player := []string{}
-			for i := 0; i < ga.playerCount; i++ {
-				player = append(player, fmt.Sprintf("Player %v", i+1))
-			}
-			ga.observer.InitPlayer(player)
+			ga.observer = NewGameObserver(player)
 			ga.observer.NewRound(ga.currentRound, nil)
 
 			fmt.Println("Game started with", player, "players")
@@ -280,6 +276,11 @@ func (ga *GameAnalyzer) getRoundResult(frame gocv.Mat) ([4]int, bool) {
 			if ga.Matches(frame, row[:]) {
 				placements[p] = i + 1
 				foundPlayer++
+
+				if ga.currentRound == 1 {
+					ga.getPayerName(frame, p+1, 0, rowDistance*i)
+				}
+
 			}
 
 			if foundPlayer == ga.playerCount {
@@ -377,4 +378,27 @@ func (ga *GameAnalyzer) addOffset(pixels []Pixel, x int, y int) []Pixel {
 	}
 
 	return pixels
+}
+
+func (ga *GameAnalyzer) getPayerName(frame gocv.Mat, player int, xOffset int, yOffset int) {
+	croppedMat := frame.Region(image.Rect(710+xOffset, 105+yOffset, 1180+xOffset, 155+yOffset))
+	playerImg := croppedMat.Clone()
+
+	//save image
+	imageName := fmt.Sprintf("player_%v.png", player)
+	gocv.IMWrite(imageName, playerImg)
+
+	// ocr
+	client := gosseract.NewClient()
+	client.SetLanguage("deu")
+	defer client.Close()
+	client.SetImage(imageName)
+	text, err := client.Text()
+
+	if err != nil {
+		fmt.Println("Error reading player name")
+		text = fmt.Sprintf("Player %v", player)
+	}
+
+	ga.observer.RegisterPlayer(player, text)
 }

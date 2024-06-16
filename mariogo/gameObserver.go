@@ -3,10 +3,11 @@ package mariogo
 import "gorm.io/gorm/clause"
 
 type GameObserver struct {
-	game Game
+	game        Game
+	playerCount int
 }
 
-func NewGameObserver() *GameObserver {
+func NewGameObserver(player int) *GameObserver {
 
 	game := Game{
 		Finished: false,
@@ -16,7 +17,8 @@ func NewGameObserver() *GameObserver {
 	DB.First(&game)
 
 	return &GameObserver{
-		game: game,
+		game:        game,
+		playerCount: player,
 	}
 }
 
@@ -52,24 +54,6 @@ func (g *GameObserver) NewRound(index int, trackName *string) {
 	}
 
 	DB.Create(&round)
-	g.updateGame()
-}
-
-func (g *GameObserver) InitPlayer(player []string) {
-
-	var players []Player
-
-	for i, name := range player {
-		player := Player{
-			Number: i + 1,
-			Name:   name,
-			Game:   g.game,
-			GameID: g.game.ID,
-		}
-		players = append(players, player)
-	}
-
-	DB.Create(&players)
 	g.updateGame()
 }
 
@@ -124,5 +108,17 @@ func (g *GameObserver) InterimResults(placements [4]int) {
 	}
 
 	DB.Create(&interimPlacements)
+	g.updateGame()
+}
+
+func (g *GameObserver) RegisterPlayer(player int, name string) {
+
+	playerModel := Player{
+		GameID:       g.game.ID,
+		Number:       player,
+		FallbackName: &name,
+	}
+
+	DB.Save(&playerModel)
 	g.updateGame()
 }
