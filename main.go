@@ -1,6 +1,8 @@
 package main
 
-import "github.com/joho/godotenv"
+import (
+	"github.com/joho/godotenv"
+)
 
 func main() {
 
@@ -14,6 +16,8 @@ func main() {
 
 	// DB.AutoMigrate(&Game{}, &Round{}, &Character{}, &Person{}, &Player{}, &RoundPlacement{}, &Placement{})
 
+	// SeedCharacter()
+
 	ga := NewGameAnalyzer()
 
 	go runWebServer()
@@ -23,13 +27,13 @@ func main() {
 	// img := ga.GetCurrentFrame()
 
 	// Bild einlesen
-	// img := gocv.IMRead("images/2plong/frame_278.png", gocv.IMReadColor)
+	// img := gocv.IMRead("images/frame_1.png", gocv.IMReadColor)
 	// if img.Empty() {
 	// 	fmt.Println("Fehler beim Einlesen des Bildes")
 	// 	return
 	// }
 
-	// placements, ok := ga.GetRoundResult(img)
+	// placements, ok := ga.GetInterimResults(img)
 
 	// fmt.Println("Placements:", placements, "OK:", ok)
 
