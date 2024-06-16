@@ -51,6 +51,7 @@ type Player struct {
 type Character struct {
 	gorm.Model
 	Name    string
+	Weight  string
 	Image   string
 	Persons []Person
 }
