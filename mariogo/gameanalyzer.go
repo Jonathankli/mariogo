@@ -277,7 +277,7 @@ func (ga *GameAnalyzer) getRoundResult(frame gocv.Mat) ([4]int, bool) {
 				placements[p] = i + 1
 				foundPlayer++
 
-				if ga.currentRound == 1 {
+				if ga.currentRound == 1 && ga.observer.GetRegisteredPlayer() != ga.playerCount {
 					ga.getPayerName(frame, p+1, 0, rowDistance*i)
 				}
 
@@ -400,5 +400,6 @@ func (ga *GameAnalyzer) getPayerName(frame gocv.Mat, player int, xOffset int, yO
 		text = fmt.Sprintf("Player %v", player)
 	}
 
+	fmt.Println("Player ", player, ": ", text)
 	ga.observer.RegisterPlayer(player, text)
 }

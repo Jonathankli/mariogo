@@ -122,3 +122,7 @@ func (g *GameObserver) RegisterPlayer(player int, name string) {
 	DB.Save(&playerModel)
 	g.updateGame()
 }
+
+func (g *GameObserver) GetRegisteredPlayer() int {
+	return len(g.game.Players)
+}
