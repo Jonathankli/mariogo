@@ -224,7 +224,7 @@ func (ga *GameAnalyzer) isRacing(frame gocv.Mat, state int) bool {
 		return true
 	} else if ga.playerCount == 3 && ga.Matches(frame, ThreePlayerPlaying) {
 		return true
-	} else if ga.playerCount == 1 && ga.Matches(frame, FourPlayerPlaying) {
+	} else if ga.playerCount == 4 && ga.Matches(frame, FourPlayerPlaying) {
 		return true
 	}
 
