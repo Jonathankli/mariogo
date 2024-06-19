@@ -3,6 +3,7 @@ package analyzer
 import (
 	"fmt"
 	"image/color"
+	"jkli/mariogo/mariogo"
 	"jkli/mariogo/mariogo/pixel"
 )
 
@@ -36,6 +37,7 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 	for i := 0; i < 12; i++ {
 
 		if foundPlayer == ga.playerCount {
+			ga.playerNamesRegistered = true
 			break
 		}
 
@@ -51,14 +53,13 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 			if ga.capture.Matches(row[:]) {
 				placements[p] = i + 1
 				foundPlayer++
-				fmt.Println("Player ", p+1, " found at position ", i+1)
-				if ga.currentRound == 1 && ga.observer.GetRegisteredPlayer() != ga.playerCount {
+				if ga.currentRound == 1 && ga.playerNamesRegistered {
 					ga.getPayerName(p+1, 0, rowDistance*i)
 				}
-
 			}
 
 			if foundPlayer == ga.playerCount {
+				ga.playerNamesRegistered = true
 				break
 			}
 		}
@@ -101,6 +102,7 @@ func (ga *GameAnalyzer) getPayerName(player int, xOffset int, yOffset int) {
 		text = fmt.Sprintf("Player %v", player)
 	}
 
-	fmt.Println("Player ", player, ": ", text)
-	ga.observer.RegisterPlayer(player, text)
+	ga.NotifyObservers(func(o mariogo.Observer) {
+		o.PlayerName(player, text)
+	})
 }

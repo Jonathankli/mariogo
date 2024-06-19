@@ -45,5 +45,14 @@ func (ga *GameAnalyzer) getRoundName() {
 		text = fmt.Sprintf("Round %v", round)
 	}
 
-	fmt.Println("Round ", round, ": ", text)
+	ga.nextRoundName = text
+}
+
+func (ga *GameAnalyzer) getNextRoundName() string {
+	if ga.nextRoundName != "" {
+		defer func() { ga.nextRoundName = "" }()
+		return ga.nextRoundName
+	}
+
+	return fmt.Sprintf("Round %v", ga.currentRound)
 }

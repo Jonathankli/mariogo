@@ -3,6 +3,7 @@ package main
 import (
 	"jkli/mariogo/mariogo"
 	"jkli/mariogo/mariogo/analyzer"
+	"jkli/mariogo/mariogo/observer"
 
 	"github.com/joho/godotenv"
 )
@@ -31,6 +32,9 @@ func main() {
 	// mariogo.SeedCharacter()
 
 	ga := analyzer.NewGameAnalyzer()
+
+	ga.AddObserver(&observer.Logger{})
+	ga.AddObserver(&observer.Database{})
 
 	// go mariogo.RunWebServer()
 

@@ -14,7 +14,7 @@ type Game struct {
 type Round struct {
 	gorm.Model
 	Index      int
-	TrackName  *string
+	TrackName  string
 	Placements []RoundPlacement
 	Game       Game
 	GameID     *uint

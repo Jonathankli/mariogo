@@ -10,34 +10,45 @@ import (
 )
 
 const (
-	idle          = iota
-	loading       = iota
-	racing        = iota
-	pause         = iota
-	roundResults  = iota
-	interimResult = iota
-	endResults    = iota
+	Idle           = iota
+	Loading        = iota
+	Racing         = iota
+	Pause          = iota
+	RoundResults   = iota
+	InterimResults = iota
+	EndResults     = iota
 )
 
 type GameAnalyzer struct {
-	state             int
-	stateUpdatedAt    time.Time
-	capture           *mariogo.Capture
-	currentRound      int
-	playerCount       int
-	running           bool
-	nextRoundCaptured bool
-	observer          *mariogo.GameObserver
+	state                 int
+	stateUpdatedAt        time.Time
+	capture               *mariogo.Capture
+	currentRound          int
+	playerCount           int
+	running               bool
+	observers             []mariogo.Observer
+	nextRoundName         string
+	playerNamesRegistered bool
 }
 
 func NewGameAnalyzer() *GameAnalyzer {
 	return &GameAnalyzer{
-		state:             idle,
-		capture:           mariogo.NewCapture(),
-		playerCount:       0,
-		currentRound:      0,
-		nextRoundCaptured: false,
-		running:           true,
+		state:                 Idle,
+		capture:               mariogo.NewCapture(),
+		playerCount:           0,
+		currentRound:          0,
+		running:               true,
+		playerNamesRegistered: false,
+	}
+}
+
+func (ga *GameAnalyzer) AddObserver(o mariogo.Observer) {
+	ga.observers = append(ga.observers, o)
+}
+
+func (ga *GameAnalyzer) NotifyObservers(callback func(mariogo.Observer)) {
+	for _, o := range ga.observers {
+		callback(o)
 	}
 }
 
@@ -68,92 +79,99 @@ func (ga *GameAnalyzer) updateState() {
 	newState := ga.state
 
 	switch ga.state {
-	case idle: // -> loading
-		if !ga.nextRoundCaptured && ga.capture.Matches(pixel.IntroPage) {
+	case Idle: // -> Racing
+
+		// New round name
+		if ga.nextRoundName == "" && ga.capture.Matches(pixel.IntroPage) {
 			ga.getRoundName()
-			ga.nextRoundCaptured = true
 		}
+
 		if started, player := ga.gameStarted(); started {
 			ga.playerCount = player
 			ga.currentRound = 1
-			newState = racing
-			ga.observer = mariogo.NewGameObserver(player)
-			ga.observer.NewRound(ga.currentRound, nil)
+			newState = Racing
 
-			fmt.Println("Game started with", player, "players")
+			ga.NotifyObservers(func(o mariogo.Observer) {
+				o.PlayerCount(player)
+				o.NewRound(ga.getNextRoundName())
+			})
 		}
-	case loading:
+	case Loading:
 		// TODO
-	case racing: // -> pause
+	case Racing: // -> pause
 		if !ga.isRacing() {
-			newState = pause
-			fmt.Println("Game paused")
+			newState = Pause
 		}
-	case pause: // -> roundResults | racing
+	case Pause: // -> roundResults | racing
 		// back to racing
 		if ga.isRacing() {
-			newState = racing
-			fmt.Println("Game resumed")
+			newState = Racing
 		}
 
 		// round results
 		placements, ok := ga.GetRoundResult()
 		if ok {
-			fmt.Println("Round results:", placements)
-			ga.observer.RoundResults(placements)
-			newState = roundResults
+			newState = RoundResults
+			ga.NotifyObservers(func(o mariogo.Observer) {
+				o.RoundResults(placements)
+			})
 		}
-	case roundResults: // -> inertimResult | racing
+	case RoundResults: // -> inertimResult | racing
 
-		if !ga.nextRoundCaptured && ga.capture.Matches(pixel.IntroPage) {
+		// New round name
+		if ga.nextRoundName == "" && ga.capture.Matches(pixel.IntroPage) {
 			ga.getRoundName()
-			ga.nextRoundCaptured = true
 		}
 		// new round
 		if ga.isRacing() {
-			newState = racing
+			newState = Racing
 			ga.currentRound++
-			ga.observer.NewRound(ga.currentRound, nil)
-			fmt.Println("New round started")
+			ga.NotifyObservers(func(o mariogo.Observer) {
+				o.NewRound(ga.getNextRoundName())
+			})
 		}
 
 		// interim results
 		if results, ok := ga.getInterimResults(); ok {
-			newState = interimResult
-			ga.observer.InterimResults(results)
-			fmt.Println("Interim results:", results)
+			newState = InterimResults
+			ga.NotifyObservers(func(o mariogo.Observer) {
+				o.InterimResults(results)
+			})
 		}
 
-	case interimResult: // -> racing | endResults
+	case InterimResults: // -> racing | endResults
 
-		if !ga.nextRoundCaptured && ga.capture.Matches(pixel.IntroPage) {
+		if ga.nextRoundName == "" && ga.capture.Matches(pixel.IntroPage) {
 			ga.getRoundName()
-			ga.nextRoundCaptured = true
 		}
 		// new round
 		if ga.isRacing() {
-			newState = racing
+			newState = Racing
 			ga.currentRound++
-			ga.observer.NewRound(ga.currentRound, nil)
-			fmt.Println("New round started")
+			ga.NotifyObservers(func(o mariogo.Observer) {
+				o.NewRound(ga.getNextRoundName())
+			})
 		}
 
 		// end results
 		if ga.capture.Matches(pixel.EndResults) {
-			newState = endResults
+			newState = EndResults
 		}
 
-	case endResults:
+	case EndResults:
 		// TODO
-		fmt.Println("Game ended")
-		ga.observer.Finish()
-		newState = idle
+		newState = Idle
+		ga.NotifyObservers(func(o mariogo.Observer) {
+			o.StateChange(ga.state, newState)
+		})
 	}
 
 	if newState != ga.state {
+		ga.NotifyObservers(func(o mariogo.Observer) {
+			o.StateChange(ga.state, newState)
+		})
 		gocv.IMWrite(fmt.Sprintf("stateChanges/%v_%v-%v.png", time.Now().Format("20060102150405"), ga.state, newState), *ga.capture.Frame)
 		ga.state = newState
 		ga.stateUpdatedAt = time.Now()
-
 	}
 }
