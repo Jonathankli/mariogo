@@ -2,6 +2,7 @@ package main
 
 import (
 	"jkli/mariogo/mariogo"
+	"jkli/mariogo/mariogo/analyzer"
 
 	"github.com/joho/godotenv"
 )
@@ -29,21 +30,27 @@ func main() {
 
 	// mariogo.SeedCharacter()
 
-	ga := mariogo.NewGameAnalyzer()
+	ga := analyzer.NewGameAnalyzer()
 
-	go mariogo.RunWebServer()
+	// go mariogo.RunWebServer()
 
 	ga.Run()
 
 	// img := ga.GetCurrentFrame()
 
 	// Bild einlesen
-	// img := gocv.IMRead("frame_101.png", gocv.IMReadColor)
+	// img := gocv.IMRead("images/testdata/race_results_4p.png", gocv.IMReadColor)
 	// if img.Empty() {
 	// 	fmt.Println("Fehler beim Einlesen des Bildes")
 	// 	return
 	// }
 
+	// placements, ok := ga.GetRoundResult(img)
+	// fmt.Println("Placements:", placements, "OK:", ok)
+
+	// start := time.Now()
+	// gocv.Resize(img, &img, image.Point{X: 1280, Y: 720}, 0, 0, gocv.InterpolationLinear)
+	// fmt.Println("Elapsed time:", time.Since(start))
 	// croppedMat := img.Region(image.Rect(710, 105, 1180, 155))
 	// resultMat := croppedMat.Clone()
 
@@ -51,6 +58,6 @@ func main() {
 
 	// fmt.Println("Placements:", placements, "OK:", ok)
 
-	// gocv.IMWrite("testtt.png", resultMat)
+	// gocv.IMWrite("res.png", img)
 
 }
