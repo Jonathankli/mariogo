@@ -22,7 +22,6 @@ const (
 type GameAnalyzer struct {
 	state             int
 	stateUpdatedAt    time.Time
-	gameModel         mariogo.Game
 	capture           *mariogo.Capture
 	currentRound      int
 	playerCount       int

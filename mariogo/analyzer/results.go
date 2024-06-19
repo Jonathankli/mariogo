@@ -14,10 +14,10 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 	}
 
 	colors := [4]color.RGBA{
-		color.RGBA{250, 229, 38, 255},  //P1
-		color.RGBA{33, 229, 251, 255},  //P2
-		color.RGBA{253, 116, 116, 255}, //P3
-		color.RGBA{115, 242, 40, 255},  //P4
+		{250, 229, 38, 255},  //P1
+		{33, 229, 251, 255},  //P2
+		{253, 116, 116, 255}, //P3
+		{115, 242, 40, 255},  //P4
 	}
 
 	placements := [4]int{0, 0, 0, 0}
