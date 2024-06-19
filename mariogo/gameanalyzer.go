@@ -22,15 +22,16 @@ const (
 )
 
 type GameAnalyzer struct {
-	state          int
-	stateUpdatedAt time.Time
-	gameModel      Game
-	webcam         *gocv.VideoCapture
-	frame          int
-	currentRound   int
-	playerCount    int
-	running        bool
-	observer       *GameObserver
+	state             int
+	stateUpdatedAt    time.Time
+	gameModel         Game
+	webcam            *gocv.VideoCapture
+	frame             int
+	currentRound      int
+	playerCount       int
+	running           bool
+	nextRoundCaptured bool
+	observer          *GameObserver
 }
 
 type Pixel struct {
@@ -46,12 +47,13 @@ func NewGameAnalyzer() *GameAnalyzer {
 	}
 
 	return &GameAnalyzer{
-		state:        idle,
-		webcam:       webcam,
-		frame:        0,
-		playerCount:  0,
-		currentRound: 0,
-		running:      true,
+		state:             idle,
+		webcam:            webcam,
+		frame:             0,
+		playerCount:       0,
+		currentRound:      0,
+		nextRoundCaptured: false,
+		running:           true,
 	}
 }
 
@@ -74,7 +76,7 @@ func (ga *GameAnalyzer) Run() {
 
 		// fmt.Println("Time:", time.Since(startTime))
 
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
@@ -89,6 +91,8 @@ func (ga *GameAnalyzer) GetCurrentFrame() gocv.Mat {
 	if img.Empty() {
 		panic("no image on device 0")
 	}
+
+	gocv.Resize(img, &img, image.Point{X: 1280, Y: 720}, 0, 0, gocv.InterpolationLinear)
 
 	return img
 }
@@ -125,6 +129,10 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 
 	switch ga.state {
 	case idle: // -> loading
+		if !ga.nextRoundCaptured && ga.Matches(frame, IntroPage) {
+			ga.getRoundName(frame)
+			ga.nextRoundCaptured = true
+		}
 		if started, player := ga.gameStarted(frame, newState); started {
 			ga.playerCount = player
 			ga.currentRound = 1
@@ -149,13 +157,18 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 		}
 
 		// round results
-		placements, ok := ga.getRoundResult(frame)
+		placements, ok := ga.GetRoundResult(frame)
 		if ok {
 			fmt.Println("Round results:", placements)
 			ga.observer.RoundResults(placements)
 			newState = roundResults
 		}
 	case roundResults: // -> inertimResult | racing
+
+		if !ga.nextRoundCaptured && ga.Matches(frame, IntroPage) {
+			ga.getRoundName(frame)
+			ga.nextRoundCaptured = true
+		}
 		// new round
 		if ga.isRacing(frame, newState) {
 			newState = racing
@@ -173,6 +186,10 @@ func (ga *GameAnalyzer) updateState(frame gocv.Mat) {
 
 	case interimResult: // -> racing | endResults
 
+		if !ga.nextRoundCaptured && ga.Matches(frame, IntroPage) {
+			ga.getRoundName(frame)
+			ga.nextRoundCaptured = true
+		}
 		// new round
 		if ga.isRacing(frame, newState) {
 			newState = racing
@@ -231,10 +248,10 @@ func (ga *GameAnalyzer) isRacing(frame gocv.Mat, state int) bool {
 	return false
 }
 
-func (ga *GameAnalyzer) getRoundResult(frame gocv.Mat) ([4]int, bool) {
+func (ga *GameAnalyzer) GetRoundResult(frame gocv.Mat) ([4]int, bool) {
 
 	if ga.playerCount == 1 {
-		position, ok := ga.getRoundResultOnePlayer(frame)
+		position, ok := ga.GetRoundResultOnePlayer(frame)
 		return [4]int{position, 0, 0, 0}, ok
 	}
 
@@ -248,14 +265,14 @@ func (ga *GameAnalyzer) getRoundResult(frame gocv.Mat) ([4]int, bool) {
 	placements := [4]int{0, 0, 0, 0}
 	foundPlayer := 0
 
-	rowDistance := 75
+	rowDistance := 52
 	row := [6]Pixel{
-		Pixel{x: 485, y: 100},
-		Pixel{x: 485, y: 155},
-		Pixel{x: 1435, y: 155},
-		Pixel{x: 1435, y: 100},
-		Pixel{x: 955, y: 100},
-		Pixel{x: 955, y: 155},
+		Pixel{x: 305, y: 58},
+		Pixel{x: 305, y: 95},
+		Pixel{x: 640, y: 95},
+		Pixel{x: 640, y: 58},
+		Pixel{x: 973, y: 58},
+		Pixel{x: 973, y: 95},
 	}
 
 	for i := 0; i < 12; i++ {
@@ -276,7 +293,7 @@ func (ga *GameAnalyzer) getRoundResult(frame gocv.Mat) ([4]int, bool) {
 			if ga.Matches(frame, row[:]) {
 				placements[p] = i + 1
 				foundPlayer++
-
+				fmt.Println("Player ", p+1, " found at position ", i+1)
 				if ga.currentRound == 1 && ga.observer.GetRegisteredPlayer() != ga.playerCount {
 					ga.getPayerName(frame, p+1, 0, rowDistance*i)
 				}
@@ -302,20 +319,20 @@ func (ga *GameAnalyzer) getRoundResult(frame gocv.Mat) ([4]int, bool) {
 	return placements, ok
 }
 
-func (ga *GameAnalyzer) getRoundResultOnePlayer(frame gocv.Mat) (int, bool) {
+func (ga *GameAnalyzer) GetRoundResultOnePlayer(frame gocv.Mat) (int, bool) {
 
 	color := color.RGBA{250, 229, 38, 255} //P1
 
 	placement := 0
 
-	rowDistance := 75
+	rowDistance := 52
 	row := [6]Pixel{
-		Pixel{x: 840, y: 100, c: color},
-		Pixel{x: 840, y: 155, c: color},
-		Pixel{x: 1790, y: 155, c: color},
-		Pixel{x: 1790, y: 100, c: color},
-		Pixel{x: 1310, y: 100, c: color},
-		Pixel{x: 1310, y: 155, c: color},
+		Pixel{x: 555, y: 58, c: color},
+		Pixel{x: 555, y: 95, c: color},
+		Pixel{x: 890, y: 95, c: color},
+		Pixel{x: 890, y: 58, c: color},
+		Pixel{x: 1223, y: 58, c: color},
+		Pixel{x: 1223, y: 95, c: color},
 	}
 
 	for i := 0; i < 12; i++ {
@@ -346,7 +363,7 @@ func (ga *GameAnalyzer) getInterimResults(frame gocv.Mat) ([4]int, bool) {
 		return [4]int{position, 0, 0, 0}, ok
 	}
 
-	results, ok := ga.getRoundResult(frame)
+	results, ok := ga.GetRoundResult(frame)
 
 	if ok {
 		ok = ga.Matches(frame, NeutralResultP1) || ga.Matches(frame, PositiveResultP1) || ga.Matches(frame, NegativeResultP1)
@@ -356,7 +373,7 @@ func (ga *GameAnalyzer) getInterimResults(frame gocv.Mat) ([4]int, bool) {
 }
 
 func (ga *GameAnalyzer) getInterimResultOnePlayer(frame gocv.Mat) (int, bool) {
-	result, ok := ga.getRoundResultOnePlayer(frame)
+	result, ok := ga.GetRoundResultOnePlayer(frame)
 
 	if ok {
 		xOffset := 360
@@ -381,7 +398,7 @@ func (ga *GameAnalyzer) addOffset(pixels []Pixel, x int, y int) []Pixel {
 }
 
 func (ga *GameAnalyzer) getPayerName(frame gocv.Mat, player int, xOffset int, yOffset int) {
-	croppedMat := frame.Region(image.Rect(710+xOffset, 105+yOffset, 1180+xOffset, 155+yOffset))
+	croppedMat := frame.Region(image.Rect(470+xOffset, 60+yOffset, 795+xOffset, 90+yOffset))
 	playerImg := croppedMat.Clone()
 
 	//save image
@@ -402,4 +419,28 @@ func (ga *GameAnalyzer) getPayerName(frame gocv.Mat, player int, xOffset int, yO
 
 	fmt.Println("Player ", player, ": ", text)
 	ga.observer.RegisterPlayer(player, text)
+}
+
+func (ga *GameAnalyzer) getRoundName(frame gocv.Mat) {
+	croppedMat := frame.Region(image.Rect(340, 610, 945, 670))
+	playerImg := croppedMat.Clone()
+
+	round := ga.currentRound + 1
+	//save image
+	imageName := fmt.Sprintf("round_%v.png", round)
+	gocv.IMWrite(imageName, playerImg)
+
+	// ocr
+	client := gosseract.NewClient()
+	client.SetLanguage("deu")
+	defer client.Close()
+	client.SetImage(imageName)
+	text, err := client.Text()
+
+	if err != nil || text == "" {
+		fmt.Println("Error reading round name")
+		text = fmt.Sprintf("Round %v", round)
+	}
+
+	fmt.Println("Round ", round, ": ", text)
 }
