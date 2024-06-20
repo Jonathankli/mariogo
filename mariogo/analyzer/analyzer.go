@@ -61,7 +61,7 @@ func (ga *GameAnalyzer) Run() {
 	fmt.Println("Start game analyzer")
 	// frame := 0
 	for ga.running {
-		// startTime := time.Now()
+		startTime := time.Now()
 		ga.capture.NextFrame()
 
 		// gocv.IMWrite(fmt.Sprintf("images/frame_%v.png", ga.frame), frame)
@@ -69,7 +69,7 @@ func (ga *GameAnalyzer) Run() {
 
 		ga.updateState()
 
-		// fmt.Println("Time:", time.Since(startTime))
+		fmt.Println("Time: ", time.Since(startTime))
 
 		time.Sleep(100 * time.Millisecond)
 	}
