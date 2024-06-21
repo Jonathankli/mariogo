@@ -3,6 +3,7 @@ package observer
 import (
 	"fmt"
 	"jkli/mariogo/mariogo/analyzer"
+	"time"
 )
 
 type Logger struct {
@@ -55,4 +56,11 @@ func (l *Logger) InterimResults(placements [4]int) {
 
 func (l *Logger) Abort(message string) {
 	fmt.Println("Game aborted: ", message)
+}
+
+func (l *Logger) RoundFinished(player int, round int, time time.Duration, finished bool) {
+	fmt.Println("Player", player, "finished round", round, "in", time)
+	if finished {
+		fmt.Println("Player", player, "finished")
+	}
 }

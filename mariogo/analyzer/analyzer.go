@@ -30,6 +30,9 @@ type GameAnalyzer struct {
 	observers             []mariogo.Observer
 	nextRoundName         string
 	playerNamesRegistered [4]bool
+	playerRounds          [4]int
+	playerRoundTimes      [4]time.Time
+	exactStartFound       bool
 	enableDebugImages     bool
 	enableDebugTimes      bool
 	maxFPS                int
@@ -46,6 +49,7 @@ func NewGameAnalyzer() *GameAnalyzer {
 		enableDebugImages:     os.Getenv("DEBUG_IMAGES") == "true",
 		enableDebugTimes:      os.Getenv("DEBUG_TIMES") == "true",
 		maxFPS:                30,
+		playerRounds:          [4]int{0, 0, 0, 0},
 	}
 }
 
@@ -84,7 +88,7 @@ func (ga *GameAnalyzer) Run() {
 		}
 
 		if took < time.Second/time.Duration(ga.maxFPS) {
-			sleep := took - time.Second/time.Duration(ga.maxFPS)
+			sleep := time.Second/time.Duration(ga.maxFPS) - took
 			time.Sleep(sleep)
 		}
 	}
@@ -116,7 +120,9 @@ func (ga *GameAnalyzer) updateState() {
 	case Racing: // -> pause
 		if !ga.isRacing() {
 			newState = Pause
+			break
 		}
+		ga.AnalyzeRounds()
 	case Pause: // -> roundResults | racing
 		// back to racing
 		if ga.isRacing() {

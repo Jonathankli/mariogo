@@ -22,6 +22,8 @@ func (ga *GameAnalyzer) gameStarted() (bool, int) {
 
 func (ga *GameAnalyzer) isRacing() bool {
 
+	ga.capture.MatchSetting(0.8, 0.15) // make pixel distance higher
+
 	if ga.playerCount == 1 && ga.capture.Matches(pixel.OnePlayerPlaying) {
 		return true
 	} else if ga.playerCount == 2 && ga.capture.Matches(pixel.TwoPlayerPlaying) {
@@ -31,6 +33,8 @@ func (ga *GameAnalyzer) isRacing() bool {
 	} else if ga.playerCount == 4 && ga.capture.Matches(pixel.FourPlayerPlaying) {
 		return true
 	}
+
+	ga.capture.DefaultMatchSetting()
 
 	return false
 }

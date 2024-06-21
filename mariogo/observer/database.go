@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"jkli/mariogo/mariogo"
 	"jkli/mariogo/mariogo/analyzer"
+	"time"
 
 	"gorm.io/gorm/clause"
 )
@@ -155,4 +156,7 @@ func (d *Database) CreateGame() {
 
 	mariogo.DB.Create(&game)
 	mariogo.DB.First(&d.game)
+}
+
+func (d *Database) RoundFinished(player int, round int, time time.Duration, finished bool) {
 }

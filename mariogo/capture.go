@@ -145,3 +145,12 @@ func (c *Capture) Crop(x0, y0, x1, y1 int) *gocv.Mat {
 	playerImg := croppedMat.Clone()
 	return &playerImg
 }
+
+func (c *Capture) LoadDebugImage(path string) {
+	img := gocv.IMRead(path, gocv.IMReadColor)
+	if img.Empty() {
+		fmt.Println("Fehler beim Einlesen des Bildes")
+		return
+	}
+	c.Frame = &img
+}
