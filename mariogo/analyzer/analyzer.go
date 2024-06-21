@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"jkli/mariogo/mariogo"
 	"jkli/mariogo/mariogo/pixel"
+	"os"
 	"time"
 
 	"gocv.io/x/gocv"
@@ -29,6 +30,8 @@ type GameAnalyzer struct {
 	observers             []mariogo.Observer
 	nextRoundName         string
 	playerNamesRegistered bool
+	enableDebugImages     bool
+	enableDebugTimes      bool
 }
 
 func NewGameAnalyzer() *GameAnalyzer {
@@ -39,6 +42,8 @@ func NewGameAnalyzer() *GameAnalyzer {
 		currentRound:          0,
 		running:               true,
 		playerNamesRegistered: false,
+		enableDebugImages:     os.Getenv("DEBUG_IMAGES") == "true",
+		enableDebugTimes:      os.Getenv("DEBUG_TIMES") == "true",
 	}
 }
 
@@ -59,17 +64,21 @@ func (ga *GameAnalyzer) Stop() {
 
 func (ga *GameAnalyzer) Run() {
 	fmt.Println("Start game analyzer")
-	// frame := 0
+	frame := 0
 	for ga.running {
-		// startTime := time.Now()
+		startTime := time.Now()
 		ga.capture.NextFrame()
 
-		// gocv.IMWrite(fmt.Sprintf("images/frame_%v.png", ga.frame), frame)
-		// frame++
+		if ga.enableDebugImages {
+			gocv.IMWrite(fmt.Sprintf("images/frame_%v.png", frame), *ga.capture.Frame)
+			frame++
+		}
 
 		ga.updateState()
 
-		// fmt.Println("Time: ", time.Since(startTime))
+		if ga.enableDebugTimes {
+			fmt.Println("Time: ", time.Since(startTime))
+		}
 
 		time.Sleep(100 * time.Millisecond)
 	}
