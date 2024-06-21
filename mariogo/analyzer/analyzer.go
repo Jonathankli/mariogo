@@ -29,9 +29,10 @@ type GameAnalyzer struct {
 	running               bool
 	observers             []mariogo.Observer
 	nextRoundName         string
-	playerNamesRegistered bool
+	playerNamesRegistered [4]bool
 	enableDebugImages     bool
 	enableDebugTimes      bool
+	maxFPS                int
 }
 
 func NewGameAnalyzer() *GameAnalyzer {
@@ -41,9 +42,10 @@ func NewGameAnalyzer() *GameAnalyzer {
 		playerCount:           0,
 		currentRound:          0,
 		running:               true,
-		playerNamesRegistered: false,
+		playerNamesRegistered: [4]bool{false, false, false, false},
 		enableDebugImages:     os.Getenv("DEBUG_IMAGES") == "true",
 		enableDebugTimes:      os.Getenv("DEBUG_TIMES") == "true",
+		maxFPS:                30,
 	}
 }
 
@@ -53,7 +55,7 @@ func (ga *GameAnalyzer) AddObserver(o mariogo.Observer) {
 
 func (ga *GameAnalyzer) NotifyObservers(callback func(mariogo.Observer)) {
 	for _, o := range ga.observers {
-		callback(o)
+		go callback(o)
 	}
 }
 
@@ -76,11 +78,15 @@ func (ga *GameAnalyzer) Run() {
 
 		ga.updateState()
 
+		took := time.Since(startTime)
 		if ga.enableDebugTimes {
-			fmt.Println("Time: ", time.Since(startTime))
+			fmt.Println("Time: ", took)
 		}
 
-		time.Sleep(100 * time.Millisecond)
+		if took < time.Second/time.Duration(ga.maxFPS) {
+			sleep := took - time.Second/time.Duration(ga.maxFPS)
+			time.Sleep(sleep)
+		}
 	}
 }
 

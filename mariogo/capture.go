@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 	"jkli/mariogo/mariogo/pixel"
-	"log"
 	"time"
 
 	"github.com/lucasb-eyer/go-colorful"
@@ -130,7 +129,6 @@ func (c *Capture) OCR(x0, y0, x1, y1 int) (out string, err error) {
 	crop := c.Crop(x0, y0, x1, y1)
 
 	imageName := fmt.Sprintf("images/temp/%v.png", time.Now().Unix())
-	log.Println(imageName)
 	gocv.IMWrite(imageName, *crop)
 
 	client := gosseract.NewClient()

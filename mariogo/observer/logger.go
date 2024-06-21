@@ -38,7 +38,7 @@ func (l *Logger) PlayerCount(count int) {
 }
 
 func (l *Logger) PlayerName(player int, name string) {
-	fmt.Println("Player ", player, ": ", name)
+	fmt.Println("Player", player, "is", name)
 }
 
 func (l *Logger) NewRound(name string) {
