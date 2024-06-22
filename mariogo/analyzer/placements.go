@@ -66,7 +66,7 @@ func (ga *GameAnalyzer) AnalyzeCurrentPlacements() {
 			dist, _ := hash[0].Distance(comp)
 			distDark, _ := hash[1].Distance(comp)
 
-			if dist < 16 || distDark < 16 {
+			if dist < 8 || distDark < 8 {
 				place = i + 1
 				break
 			}

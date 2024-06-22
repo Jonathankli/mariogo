@@ -44,10 +44,6 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 			if ga.capture.Matches(row[:]) {
 				placements[p] = i + 1
 				foundPlayer++
-				if !ga.playerNamesRegistered[p] {
-					ga.getPayerName(p+1, 0, rowDistance*i)
-					ga.playerNamesRegistered[p] = true
-				}
 			}
 
 			if foundPlayer == ga.playerCount {
@@ -65,6 +61,16 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 	}
 
 	ok := foundPlayer == ga.playerCount
+
+	// Extract player names
+	if ok {
+		for p := 0; p < ga.playerCount; p++ {
+			if !ga.playerNamesRegistered[p] {
+				ga.getPayerName(p+1, 0, (placements[p]-1)*rowDistance)
+				ga.playerNamesRegistered[p] = true
+			}
+		}
+	}
 
 	return placements, ok
 }
