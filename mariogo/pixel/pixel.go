@@ -47,3 +47,11 @@ func PrintPx(pixels []Pixel) {
 		fmt.Println("Pixel{X:", pixel.X, ", Y:", pixel.Y, ", C: color.RGBA{", pixel.C.R, ",", pixel.C.G, ",", pixel.C.B, ",", pixel.C.A, "}},")
 	}
 }
+
+func ColorPx(pixels []Pixel, color color.RGBA) []Pixel {
+	for i := range pixels {
+		pixels[i].C = color
+	}
+
+	return pixels
+}

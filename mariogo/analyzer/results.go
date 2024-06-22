@@ -2,7 +2,6 @@ package analyzer
 
 import (
 	"fmt"
-	"image/color"
 	"jkli/mariogo/mariogo"
 	"jkli/mariogo/mariogo/pixel"
 )
@@ -12,13 +11,6 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 	if ga.playerCount == 1 {
 		position, ok := ga.GetRoundResultOnePlayer()
 		return [4]int{position, 0, 0, 0}, ok
-	}
-
-	colors := [4]color.RGBA{
-		{250, 229, 38, 255},  //P1
-		{33, 229, 251, 255},  //P2
-		{253, 116, 116, 255}, //P3
-		{115, 242, 40, 255},  //P4
 	}
 
 	placements := [4]int{0, 0, 0, 0}
@@ -42,12 +34,12 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 
 		for p := 0; p < ga.playerCount; p++ {
 
-			row[0].C = colors[p]
-			row[1].C = colors[p]
-			row[2].C = colors[p]
-			row[3].C = colors[p]
-			row[4].C = colors[p]
-			row[5].C = colors[p]
+			row[0].C = pixel.PlayerColors[p]
+			row[1].C = pixel.PlayerColors[p]
+			row[2].C = pixel.PlayerColors[p]
+			row[3].C = pixel.PlayerColors[p]
+			row[4].C = pixel.PlayerColors[p]
+			row[5].C = pixel.PlayerColors[p]
 
 			if ga.capture.Matches(row[:]) {
 				placements[p] = i + 1

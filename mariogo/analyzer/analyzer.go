@@ -31,6 +31,7 @@ type GameAnalyzer struct {
 	nextRoundName         string
 	playerNamesRegistered [4]bool
 	playerRounds          [4]int
+	placements            [4]int
 	playerRoundTimes      [4]time.Time
 	exactStartFound       bool
 	enableDebugImages     bool
@@ -50,6 +51,7 @@ func NewGameAnalyzer() *GameAnalyzer {
 		enableDebugTimes:      os.Getenv("DEBUG_TIMES") == "true",
 		maxFPS:                30,
 		playerRounds:          [4]int{0, 0, 0, 0},
+		placements:            [4]int{0, 0, 0, 0},
 	}
 }
 
@@ -70,6 +72,7 @@ func (ga *GameAnalyzer) Stop() {
 
 func (ga *GameAnalyzer) Run() {
 	fmt.Println("Start game analyzer")
+	GeneratePlacmentHashes()
 	frame := 0
 	for ga.running {
 		startTime := time.Now()
@@ -123,6 +126,7 @@ func (ga *GameAnalyzer) updateState() {
 			break
 		}
 		ga.AnalyzeRounds()
+		ga.AnalyzeCurrentPlacements()
 	case Pause: // -> roundResults | racing
 		// back to racing
 		if ga.isRacing() {

@@ -160,3 +160,6 @@ func (d *Database) CreateGame() {
 
 func (d *Database) RoundFinished(player int, round int, time time.Duration, finished bool) {
 }
+
+func (d *Database) PlacementsChanged(places [4]int) {
+}

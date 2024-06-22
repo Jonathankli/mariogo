@@ -64,3 +64,11 @@ func (l *Logger) RoundFinished(player int, round int, time time.Duration, finish
 		fmt.Println("Player", player, "finished")
 	}
 }
+
+func (l *Logger) PlacementsChanged(old [4]int, new [4]int) {
+	for i := 0; i < 4; i++ {
+		if old[i] != new[i] && old[i] != 0 && new[i] != 0 {
+			fmt.Println("Player", i, "moved from", old[i], "to", new[i])
+		}
+	}
+}

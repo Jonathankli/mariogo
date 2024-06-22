@@ -7,6 +7,7 @@ type Observer interface {
 	PlayerCount(count int)
 	PlayerName(player int, name string)
 	NewRound(name string)
+	PlacementsChanged(old [4]int, new [4]int)
 	RoundFinished(player int, round int, time time.Duration, finished bool)
 	RoundResults(placements [4]int)
 	InterimResults(placements [4]int)

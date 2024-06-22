@@ -2,6 +2,13 @@ package pixel
 
 import "image/color"
 
+var PlayerColors = [4]color.RGBA{
+	{250, 229, 38, 255},  //P1
+	{33, 229, 251, 255},  //P2
+	{253, 116, 116, 255}, //P3
+	{115, 242, 40, 255},  //P4
+}
+
 var NeutralResultP1 = []Pixel{
 	{X: 314, Y: 175, C: color.RGBA{9, 190, 2, 255}},
 	{X: 326, Y: 181, C: color.RGBA{70, 221, 0, 255}},
