@@ -159,7 +159,63 @@ func (d *Database) CreateGame() {
 }
 
 func (d *Database) RoundFinished(player int, round int, time time.Duration, finished bool) {
+
+	playerModel := d.game.GetPlayerByPosition(player)
+	roundModel := d.game.GetCurrentRound()
+
+	if roundModel == nil || playerModel == nil {
+		return
+	}
+
+	roundTime := mariogo.RoundTime{
+		PlayerID: playerModel.ID,
+		RoundID:  roundModel.ID,
+		Time:     uint(time.Milliseconds()),
+	}
+
+	mariogo.DB.Save(&roundTime)
+	d.updateGame()
 }
 
-func (d *Database) PlacementsChanged(places [4]int) {
+func (d *Database) PlacementsChanged(old [4]int, new [4]int, roundTime time.Duration) {
+
+	if len(d.game.Rounds) == 0 {
+		return
+	}
+
+	var p1, p2, p3, p4 *uint
+	round := d.game.Rounds[len(d.game.Rounds)-1]
+
+	if new[0] != 0 {
+		place := uint(new[0])
+		p1 = &place
+	}
+
+	if new[1] != 0 {
+		place := uint(new[1])
+		p2 = &place
+	}
+
+	if new[2] != 0 {
+		place := uint(new[2])
+		p3 = &place
+	}
+
+	if new[3] != 0 {
+		place := uint(new[3])
+		p4 = &place
+	}
+
+	log := mariogo.PlacementChangeLog{
+		RoundID: round.ID,
+		Time:    uint(roundTime.Milliseconds()),
+		Player1: p1,
+		Player2: p2,
+		Player3: p3,
+		Player4: p4,
+	}
+
+	mariogo.DB.Create(&log)
+
+	d.updateGame()
 }

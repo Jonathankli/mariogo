@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"jkli/mariogo/mariogo"
 	"jkli/mariogo/mariogo/pixel"
+	"time"
 
 	"github.com/corona10/goimagehash"
 	"gocv.io/x/gocv"
@@ -55,6 +56,7 @@ func (ga *GameAnalyzer) AnalyzeCurrentPlacements() {
 	for i := 0; i < ga.playerCount; i++ {
 		refPx := PlacementReference[i]
 		cropped := ga.capture.Crop(refPx.X-12, refPx.Y-10, refPx.X+20, refPx.Y+40)
+		defer cropped.Close()
 		gocv.CvtColor(*cropped, cropped, gocv.ColorBGRToGray)
 		image, _ := cropped.ToImage()
 
@@ -98,8 +100,9 @@ func (ga *GameAnalyzer) AnalyzeCurrentPlacements() {
 			}
 		}
 
+		since := time.Since(ga.roundStartedAt)
 		ga.NotifyObservers(func(o mariogo.Observer) {
-			o.PlacementsChanged(oldPlacements, newPlacements)
+			o.PlacementsChanged(oldPlacements, newPlacements, since)
 		})
 
 		ga.placements = newPlacements

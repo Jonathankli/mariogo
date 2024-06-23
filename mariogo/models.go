@@ -1,6 +1,8 @@
 package mariogo
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Game struct {
 	gorm.Model
@@ -13,11 +15,32 @@ type Game struct {
 
 type Round struct {
 	gorm.Model
-	Index      int
-	TrackName  string
-	Placements []RoundPlacement
-	Game       Game
-	GameID     *uint
+	Index               int
+	TrackName           string
+	Placements          []RoundPlacement
+	PlacementChangeLogs []PlacementChangeLog
+	Game                Game
+	GameID              *uint
+}
+
+type PlacementChangeLog struct {
+	gorm.Model
+	Round   Round
+	RoundID uint
+	Time    uint
+	Player1 *uint
+	Player2 *uint
+	Player3 *uint
+	Player4 *uint
+}
+
+type RoundTime struct {
+	gorm.Model
+	Round    Round
+	RoundID  uint
+	Player   Player
+	PlayerID uint
+	Time     uint
 }
 
 type RoundPlacement struct {
@@ -63,4 +86,20 @@ type Person struct {
 	Name        uint
 	Character   *Character
 	CharacterID *uint
+}
+
+func (g *Game) GetPlayerByPosition(position int) *Player {
+	for _, player := range g.Players {
+		if player.Number == position {
+			return &player
+		}
+	}
+	return nil
+}
+
+func (g *Game) GetCurrentRound() *Round {
+	if len(g.Rounds) == 0 {
+		return nil
+	}
+	return &g.Rounds[len(g.Rounds)-1]
 }

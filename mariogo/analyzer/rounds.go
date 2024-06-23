@@ -24,12 +24,13 @@ func (ga *GameAnalyzer) AnalyzeRounds() {
 		{X: 843, Y: 480},
 	}
 
+	now := time.Now()
+
 	if ga.capture.Matches(pixel.StartRace) {
 		ga.initRoundTimes()
+		ga.roundStartedAt = now
 		ga.exactStartFound = true
 	}
-
-	now := time.Now()
 
 	for i := 0; i < ga.playerCount; i++ {
 		ref := roundReverencePixels[i]

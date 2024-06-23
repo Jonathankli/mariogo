@@ -18,6 +18,7 @@ func main() {
 	mariogo.DatabaseConnect()
 	ga := analyzer.NewGameAnalyzer()
 	ga.AddObserver(&observer.Logger{})
+	ga.AddObserver(&observer.Database{})
 	ga.Run()
 
 }
@@ -47,7 +48,7 @@ func main() {
 
 // mariogo.DatabaseConnect()
 
-// mariogo.DB.AutoMigrate(&mariogo.Game{}, &mariogo.Round{}, &mariogo.Character{}, &mariogo.Person{}, &mariogo.Player{}, &mariogo.RoundPlacement{}, &mariogo.Placement{})
+// mariogo.DB.AutoMigrate(&mariogo.Game{}, &mariogo.Round{}, &mariogo.Character{}, &mariogo.Person{}, &mariogo.Player{}, &mariogo.RoundPlacement{}, &mariogo.Placement{}, &mariogo.PlacementChangeLog{}, &mariogo.RoundTime{})
 
 // mariogo.SeedCharacter()
 

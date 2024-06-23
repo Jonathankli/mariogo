@@ -37,6 +37,7 @@ type GameAnalyzer struct {
 	enableDebugImages     bool
 	enableDebugTimes      bool
 	maxFPS                int
+	roundStartedAt        time.Time
 }
 
 func NewGameAnalyzer() *GameAnalyzer {
@@ -113,6 +114,7 @@ func (ga *GameAnalyzer) updateState() {
 			ga.currentRound = 1
 			newState = Racing
 			roundName := ga.getNextRoundName()
+			ga.roundStartedAt = time.Now().Add(time.Second * 4) // TODO: Find exact time
 
 			ga.NotifyObservers(func(o mariogo.Observer) {
 				o.PlayerCount(player)
