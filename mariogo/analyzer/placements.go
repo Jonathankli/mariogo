@@ -80,11 +80,28 @@ func (ga *GameAnalyzer) AnalyzeCurrentPlacements() {
 
 	if change {
 		oldPlacements := ga.placements
+
+		//make sure every placement is unique
+		for i := 0; i < ga.playerCount; i++ { //loop over every player
+			for j := 0; j < ga.playerCount; j++ { //loop over every player to compare
+				isSamePlayer := i == j
+				if !isSamePlayer && newPlacements[i] == newPlacements[j] {
+
+					// if tow players have the same placement, we assume they switched places aand increment or decrement the one who has not changed
+					if oldPlacements[i] == newPlacements[i] {
+						newPlacements[j]++
+					} else {
+						newPlacements[j]--
+					}
+
+				}
+			}
+		}
+
 		ga.NotifyObservers(func(o mariogo.Observer) {
 			o.PlacementsChanged(oldPlacements, newPlacements)
 		})
 
-		//TODO: Check if placements are valid an no double placements
 		ga.placements = newPlacements
 	}
 
