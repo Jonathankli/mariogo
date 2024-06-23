@@ -112,10 +112,11 @@ func (ga *GameAnalyzer) updateState() {
 			ga.playerCount = player
 			ga.currentRound = 1
 			newState = Racing
+			roundName := ga.getNextRoundName()
 
 			ga.NotifyObservers(func(o mariogo.Observer) {
 				o.PlayerCount(player)
-				o.NewRound(ga.getNextRoundName())
+				o.NewRound(roundName)
 			})
 		}
 	case Loading:
@@ -151,8 +152,9 @@ func (ga *GameAnalyzer) updateState() {
 		if ga.isRacing() {
 			newState = Racing
 			ga.currentRound++
+			roundName := ga.getNextRoundName()
 			ga.NotifyObservers(func(o mariogo.Observer) {
-				o.NewRound(ga.getNextRoundName())
+				o.NewRound(roundName)
 			})
 		}
 
@@ -173,8 +175,9 @@ func (ga *GameAnalyzer) updateState() {
 		if ga.isRacing() {
 			newState = Racing
 			ga.currentRound++
+			roundName := ga.getNextRoundName()
 			ga.NotifyObservers(func(o mariogo.Observer) {
-				o.NewRound(ga.getNextRoundName())
+				o.NewRound(roundName)
 			})
 		}
 
@@ -195,7 +198,7 @@ func (ga *GameAnalyzer) updateState() {
 		ga.NotifyObservers(func(o mariogo.Observer) {
 			o.StateChange(ga.state, newState)
 		})
-		gocv.IMWrite(fmt.Sprintf("stateChanges/%v_%v-%v.png", time.Now().Format("20060102150405"), ga.state, newState), *ga.capture.Frame)
+		gocv.IMWrite(fmt.Sprintf("images/stateChanges/%v_%v-%v.png", time.Now().Format("20060102150405"), ga.state, newState), *ga.capture.Frame)
 		ga.state = newState
 		ga.stateUpdatedAt = time.Now()
 	}
