@@ -142,8 +142,7 @@ func (c *Capture) OCR(x0, y0, x1, y1 int) (out string, err error) {
 
 func (c *Capture) Crop(x0, y0, x1, y1 int) *gocv.Mat {
 	croppedMat := c.Frame.Region(image.Rect(x0, y0, x1, y1))
-	playerImg := croppedMat.Clone()
-	return &playerImg
+	return &croppedMat
 }
 
 func (c *Capture) LoadDebugImage(path string) {

@@ -24,6 +24,9 @@ func GeneratePlacmentHashes() {
 	for i := 1; i <= 12; i++ {
 		img := gocv.IMRead(fmt.Sprintf("mariogo/samples/placements/%v.png", i), gocv.IMReadColor)
 		imgDark := gocv.IMRead(fmt.Sprintf("mariogo/samples/placements/%v_dark.png", i), gocv.IMReadColor)
+		defer img.Close()
+		defer imgDark.Close()
+
 		if img.Empty() || imgDark.Empty() {
 			fmt.Println("Fehler beim Einlesen des Bildes")
 			return
@@ -55,10 +58,15 @@ func (ga *GameAnalyzer) AnalyzeCurrentPlacements() {
 
 	for i := 0; i < ga.playerCount; i++ {
 		refPx := PlacementReference[i]
+
 		cropped := ga.capture.Crop(refPx.X-12, refPx.Y-10, refPx.X+20, refPx.Y+40)
-		defer cropped.Close()
-		gocv.CvtColor(*cropped, cropped, gocv.ColorBGRToGray)
-		image, _ := cropped.ToImage()
+		placeMat := gocv.NewMat()
+
+		gocv.CvtColor(*cropped, &placeMat, gocv.ColorBGRToGray)
+		image, _ := placeMat.ToImage()
+
+		cropped.Close()
+		placeMat.Close()
 
 		place := 0
 
@@ -89,7 +97,7 @@ func (ga *GameAnalyzer) AnalyzeCurrentPlacements() {
 				isSamePlayer := i == j
 				if !isSamePlayer && newPlacements[i] == newPlacements[j] {
 
-					// if tow players have the same placement, we assume they switched places aand increment or decrement the one who has not changed
+					// if tow players have the same placement, we assume they switched places and increment or decrement the one who has not changed
 					if oldPlacements[i] == newPlacements[i] {
 						newPlacements[j]++
 					} else {
