@@ -19,7 +19,7 @@ type Round struct {
 	TrackName           string
 	Placements          []RoundPlacement
 	PlacementChangeLogs []PlacementChangeLog
-	Game                Game
+	Game                Game `json:"-"`
 	GameID              *uint
 }
 
@@ -36,9 +36,9 @@ type PlacementChangeLog struct {
 
 type RoundTime struct {
 	gorm.Model
-	Round    Round
+	Round    Round `json:"-"`
 	RoundID  uint
-	Player   Player
+	Player   Player `json:"-"`
 	PlayerID uint
 	Time     uint
 }
@@ -47,16 +47,16 @@ type RoundPlacement struct {
 	gorm.Model
 	Round    Round
 	RoundID  uint
-	Player   Player
+	Player   Player `json:"-"`
 	PlayerID uint
 	Position int
 }
 
 type Placement struct {
 	gorm.Model
-	Game     Game
+	Game     Game `json:"-"`
 	GameID   uint
-	Player   Player
+	Player   Player `json:"-"`
 	PlayerID uint
 	Position int
 }
@@ -64,7 +64,7 @@ type Placement struct {
 type Player struct {
 	gorm.Model
 	Number       int
-	Game         Game
+	Game         Game `json:"-"`
 	GameID       uint
 	FallbackName *string
 	Character    *Character
