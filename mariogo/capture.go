@@ -1,6 +1,7 @@
 package mariogo
 
 import (
+	"errors"
 	"fmt"
 	"image"
 	"image/color"
@@ -104,15 +105,7 @@ func (c *Capture) Matches(pixels []pixel.Pixel) bool {
 		vec := c.Frame.GetVecbAt(pixel.Y, pixel.X)
 
 		color := color.RGBA{vec[2], vec[1], vec[0], 255}
-		color1, ok1 := colorful.MakeColor(pixel.C)
-		color2, ok2 := colorful.MakeColor(color)
-
-		if !ok1 || !ok2 {
-			fmt.Printf("Error converting color: %v\n", vec)
-			continue
-		}
-
-		if color1.DistanceCIEDE2000(color2) > c.maxPixelDistance {
+		if dist, err := c.ColorDistance(color, pixel.C); dist > c.maxPixelDistance || err != nil {
 			continue
 		}
 
@@ -124,11 +117,22 @@ func (c *Capture) Matches(pixels []pixel.Pixel) bool {
 	return matchPercentage > c.frameDeviations
 }
 
+func (c *Capture) ColorDistance(c1 color.Color, c2 color.Color) (float64, error) {
+	color1, ok1 := colorful.MakeColor(c1)
+	color2, ok2 := colorful.MakeColor(c2)
+
+	if !ok1 || !ok2 {
+		return 0, errors.New("error converting color")
+	}
+
+	return color1.DistanceCIEDE2000(color2), nil
+}
+
 func (c *Capture) OCR(x0, y0, x1, y1 int) (out string, err error) {
 
 	crop := c.Crop(x0, y0, x1, y1)
 
-	imageName := fmt.Sprintf("images/temp/%v.png", time.Now().Unix())
+	imageName := fmt.Sprintf("images/temp/%v.png", time.Now().UnixMilli())
 	gocv.IMWrite(imageName, *crop)
 
 	client := gosseract.NewClient()

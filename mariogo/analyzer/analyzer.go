@@ -72,8 +72,9 @@ func (ga *GameAnalyzer) Stop() {
 }
 
 func (ga *GameAnalyzer) Run() {
-	fmt.Println("Start game analyzer")
 	GeneratePlacmentHashes()
+	LoadResultHashes()
+	fmt.Println("Start game analyzer")
 	frame := 0
 	for ga.running {
 		startTime := time.Now()
