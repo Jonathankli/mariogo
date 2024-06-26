@@ -6,7 +6,7 @@ import (
 
 type Game struct {
 	gorm.Model
-	Rounds     []Round
+	Rounds     []Round //siehe type Round struct {}
 	Players    []Player
 	Finished   bool
 	Error      *string
@@ -22,7 +22,6 @@ type Round struct {
 	Game                Game `json:"-"`
 	GameID              *uint
 }
-
 type PlacementChangeLog struct {
 	gorm.Model
 	Round   Round
@@ -42,10 +41,9 @@ type RoundTime struct {
 	PlayerID uint
 	Time     uint
 }
-
 type RoundPlacement struct {
 	gorm.Model
-	Round    Round
+	Round    Round `json:"-"`
 	RoundID  uint
 	Player   Player `json:"-"`
 	PlayerID uint
@@ -67,10 +65,10 @@ type Player struct {
 	Game         Game `json:"-"`
 	GameID       uint
 	FallbackName *string
-	Character    *Character
-	CharacterID  *uint
-	Person       *Person
-	PersonID     *uint
+	Character    *Character `json:"-"`
+	CharacterID  *uint      `json:"-"`
+	Person       *Person    `json:"-"`
+	PersonID     *uint      `json:"-"`
 }
 
 type Character struct {
