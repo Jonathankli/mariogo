@@ -26,7 +26,7 @@ The Current status of the features is:
 ## API
 TODOs for the API
 - Games
-  - [ ] Index - /games - list of all games
+  - [x] Index - /games - list of all games -> all games are shown with date, players and final placements
   - [ ] Show - /games/:id - game detail
   - [ ] Current - /games/current - current/active game details
   - [ ] Player - PATCH /games/:id/player - attach persons to player or adapt character
