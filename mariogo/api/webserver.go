@@ -25,6 +25,5 @@ func RunWebServer() {
 			"test": "test",
 		})
 	})
-	//
 	router.Run(":8888")
 }
