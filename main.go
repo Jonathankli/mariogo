@@ -18,8 +18,6 @@ func main() {
 
 	mariogo.DatabaseConnect()
 
-	// mariogo.DB.AutoMigrate(&mariogo.Game{}, &mariogo.Round{}, &mariogo.Character{}, &mariogo.Person{}, &mariogo.Player{}, &mariogo.RoundPlacement{}, &mariogo.Placement{}, &mariogo.PlacementChangeLog{}, &mariogo.RoundTime{})
-
 	go api.RunWebServer()
 
 	ga := analyzer.NewGameAnalyzer()
