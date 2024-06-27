@@ -49,3 +49,26 @@ func CreatePerson(c *gin.Context) {
 		"person": input,
 	})
 }
+
+func PatchPerson(c *gin.Context) {
+	var person mariogo.Person
+
+	if err := mariogo.DB.First(&person, c.Param("id")).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Person not found"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&person); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := mariogo.DB.Save(&person).Error; err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"person": person,
+	})
+}

@@ -52,6 +52,7 @@ TODOs for the API
 
 ## API-Instructions:
 
+
 ### Patch player-names for any game
 PATCH /games/:game_id/:number/player
 - adjust :game_id and :number according to which player you was at the game /table players
@@ -67,6 +68,7 @@ curl --location --request PATCH 'http://localhost:8888/api/games/2/4/player' \
   "character_id": 1,
   "person_id": 1
 }'
+
 
 ### Patch player-names for current game
 PATCH /games/current/:number/player
@@ -93,4 +95,15 @@ example:
 {
     "name": 3,
     "CharacterID": 3
+}
+
+
+### Update Person
+PATCH /persons/:id
+- set "name" and "CharacterID" in json-Body
+
+example:
+{
+    "name": 1,
+    "CharacterID": 1
 }
