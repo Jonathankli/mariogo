@@ -112,3 +112,8 @@ example:
 ### delete Person
 DELETE /persons/:id
 just call url, dont forget to adjust ":id"
+
+
+### Get Persons by character
+GET /characters/:id/persons
+just call url, dont forget to adjust ":id"

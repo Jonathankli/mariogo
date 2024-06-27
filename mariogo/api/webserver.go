@@ -27,6 +27,9 @@ func RunWebServer() {
 	apiRouter.POST("/persons/", CreatePerson)
 	apiRouter.PATCH("/persons/:id", PatchPerson)
 	apiRouter.DELETE("/persons/:id", DeletePerson)
+	apiRouter.GET("/characters", GetCharacters)
+	apiRouter.GET("/characters/:id", GetCharacter)
+	apiRouter.GET("/characters/:id/persons", GetPersonsByCharacter)
 
 	router.NoRoute(func(c *gin.Context) {
 		c.HTML(200, "index.tmpl", gin.H{
