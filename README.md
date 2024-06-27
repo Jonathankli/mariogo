@@ -31,7 +31,7 @@ TODOs for the API
   - [x] Current - /games/current - current/active game details
   - [x] Player - PATCH /games/:game_id/:number/player - attach persons to player or adapt character
 - Round
-  - [ ] Show - /rounds/:id - details to a round
+  - [x] Show - /rounds/:id - details to a round
 - Person
   - [ ] Index - /persons - list all persons
   - [ ] Show - /persons/:id - show person detail
