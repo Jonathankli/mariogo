@@ -86,6 +86,12 @@ type Person struct {
 	CharacterID *uint
 }
 
+type PlayerUpdateInput struct {
+	FallbackName *string `json:"fallback_name"`
+	CharacterID  *uint   `json:"character_id"`
+	PersonID     *uint   `json:"person_id"`
+}
+
 func (g *Game) GetPlayerByPosition(position int) *Player {
 	for _, player := range g.Players {
 		if player.Number == position {

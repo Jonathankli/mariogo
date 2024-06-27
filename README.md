@@ -27,9 +27,9 @@ The Current status of the features is:
 TODOs for the API
 - Games
   - [x] Index - /games - list of all games -> all games are shown with date, players and final placements
-  - [ ] Show - /games/:id - game detail
-  - [ ] Current - /games/current - current/active game details
-  - [ ] Player - PATCH /games/:id/player - attach persons to player or adapt character
+  - [x] Show - /games/:id - game detail
+  - [x] Current - /games/current - current/active game details
+  - [x] Player - PATCH /games/:game_id/:number/player - attach persons to player or adapt character
 - Round
   - [ ] Show - /rounds/:id - details to a round
 - Person
@@ -49,3 +49,38 @@ TODOs for the API
   - [ ] Leaderboard - /stats/leaderboard
   - ...
 - Websocket
+
+## API-Instructions:
+
+### Patch player-names for any game
+/games/:game_id/:number/player
+- adjust :game_id and :number according to which player you was at the game /table players
+- to set in data:
+  - fallback_name
+  - character_id
+  - person_id
+example:
+curl --location --request PATCH 'http://localhost:8888/api/games/2/4/player' \
+--header 'Content-Type: application/json' \
+--data '{
+  "fallback_name": "tanuki",
+  "character_id": 1,
+  "person_id": 1
+}'
+
+### Patch player-names for current game
+/games/current/:number/player
+- adjust :number according to which playernr. you are at the current game
+- to set in data:
+  - fallback_name
+  - character_id
+  - person_id
+
+example:
+curl --location --request PATCH 'http://localhost:8888/api/games/current/4/player' \
+--header 'Content-Type: application/json' \
+--data '{
+  "fallback_name": "tanuki",
+  "character_id": 1,
+  "person_id": 1
+}'

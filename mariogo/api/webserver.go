@@ -19,6 +19,8 @@ func RunWebServer() {
 	apiRouter.GET("/games", GetGames)
 	apiRouter.GET("/games/current", GetCurrentGame)
 	apiRouter.GET("/games/:id", GetGame)
+	apiRouter.PATCH("/games/:game_id/:number_id/player", PatchPlayer)
+	apiRouter.PATCH("/games/current/:number_id/player", PatchCurrentPlayer)
 
 	router.NoRoute(func(c *gin.Context) {
 		c.HTML(200, "index.tmpl", gin.H{
