@@ -33,8 +33,8 @@ TODOs for the API
 - Round
   - [x] Show - /rounds/:id - details to a round
 - Person
-  - [ ] Index - /persons - list all persons
-  - [ ] Show - /persons/:id - show person detail
+  - [x] Index - /persons - list all persons
+  - [x] Show - /persons/:id - show person detail
   - [ ] Create - POST /persons - create person
   - [ ] Update - PATCH /person/:id - update person
   - [ ] Delete - DELETE /person/:id - delete person
