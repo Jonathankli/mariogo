@@ -39,9 +39,9 @@ TODOs for the API
   - [x] Update - PATCH /person/:id - update person
   - [x] Delete - DELETE /person/:id - delete person
 - Character
-  - [ ] Index - /characters - list all characters
-  - [ ] Show - /characters/:id - show character detail
-  - [ ] Persons - /characters/:id/persons - list of all persons which have character as default
+  - [x] Index - /characters - list all characters
+  - [x] Show - /characters/:id - show character detail
+  - [x] Persons - /characters/:id/persons - list of all persons which have character as default
 - Track
   - [ ] Index - /tracks - list of all tracks
   - [ ] Show - /tracks/:id - stats and details to a track
