@@ -72,3 +72,23 @@ func PatchPerson(c *gin.Context) {
 		"person": person,
 	})
 }
+
+func DeletePerson(c *gin.Context) {
+	var person mariogo.Person
+
+	// Versuchen Sie, die Person anhand der ID zu finden
+	if err := mariogo.DB.First(&person, c.Param("id")).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Person not found"})
+		return
+	}
+
+	// Soft-Delete der Person
+	if err := mariogo.DB.Delete(&person).Error; err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Person deleted successfully",
+	})
+}

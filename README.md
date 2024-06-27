@@ -107,3 +107,8 @@ example:
     "name": 1,
     "CharacterID": 1
 }
+
+
+### delete Person
+DELETE /persons/:id
+just call url, dont forget to adjust ":id"
