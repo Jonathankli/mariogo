@@ -52,11 +52,12 @@ func (l *Logger) Abort(message string) {
 	fmt.Println("Game aborted: ", message)
 }
 
-func (l *Logger) RoundFinished(player int, round int, time time.Duration, finished bool) {
+func (l *Logger) RoundFinished(player int, round int, time time.Duration) {
 	fmt.Println("Player", player, "finished round", round, "in", time)
-	if finished {
-		fmt.Println("Player", player, "finished")
-	}
+}
+
+func (l *Logger) PlayerFinishedRace(player int, time time.Duration) {
+	fmt.Println("Player", player, "finished in", time)
 }
 
 func (l *Logger) PlacementsChanged(old [4]int, new [4]int, roundTime time.Duration) {

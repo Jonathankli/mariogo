@@ -133,7 +133,7 @@ func (d *Database) CreateGame() {
 	mariogo.DB.First(&d.game)
 }
 
-func (d *Database) RoundFinished(player int, round int, time time.Duration, finished bool) {
+func (d *Database) RoundFinished(player int, round int, time time.Duration) {
 
 	playerModel := d.game.GetPlayerByPosition(player)
 	roundModel := d.game.GetCurrentRound()
@@ -150,6 +150,9 @@ func (d *Database) RoundFinished(player int, round int, time time.Duration, fini
 
 	mariogo.DB.Save(&roundTime)
 	d.updateGame()
+}
+
+func (d *Database) PlayerFinishedRace(player int, time time.Duration) {
 }
 
 func (d *Database) PlacementsChanged(old [4]int, new [4]int, roundTime time.Duration) {
