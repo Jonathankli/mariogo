@@ -37,7 +37,7 @@ TODOs for the API
   - [x] Show - /persons/:id - show person detail
   - [x] Create - POST /persons - create person
   - [x] Update - PATCH /person/:id - update person
-  - [ ] Delete - DELETE /person/:id - delete person
+  - [x] Delete - DELETE /person/:id - delete person
 - Character
   - [ ] Index - /characters - list all characters
   - [ ] Show - /characters/:id - show character detail
