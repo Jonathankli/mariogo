@@ -35,7 +35,7 @@ TODOs for the API
 - Person
   - [x] Index - /persons - list all persons
   - [x] Show - /persons/:id - show person detail
-  - [ ] Create - POST /persons - create person
+  - [x] Create - POST /persons - create person
   - [ ] Update - PATCH /person/:id - update person
   - [ ] Delete - DELETE /person/:id - delete person
 - Character
@@ -53,7 +53,7 @@ TODOs for the API
 ## API-Instructions:
 
 ### Patch player-names for any game
-/games/:game_id/:number/player
+PATCH /games/:game_id/:number/player
 - adjust :game_id and :number according to which player you was at the game /table players
 - to set in data:
   - fallback_name
@@ -69,7 +69,7 @@ curl --location --request PATCH 'http://localhost:8888/api/games/2/4/player' \
 }'
 
 ### Patch player-names for current game
-/games/current/:number/player
+PATCH /games/current/:number/player
 - adjust :number according to which playernr. you are at the current game
 - to set in data:
   - fallback_name
@@ -84,3 +84,13 @@ curl --location --request PATCH 'http://localhost:8888/api/games/current/4/playe
   "character_id": 1,
   "person_id": 1
 }'
+
+### Create Person
+POST /persons/
+- set "name" and "CharacterID" in json-Body
+
+example:
+{
+    "name": 3,
+    "CharacterID": 3
+}

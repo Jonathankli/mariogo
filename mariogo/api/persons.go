@@ -31,3 +31,21 @@ func GetPerson(c *gin.Context) {
 
 	c.JSON(200, person)
 }
+
+func CreatePerson(c *gin.Context) {
+	var input mariogo.Person
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := mariogo.DB.Create(&input).Error; err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(201, gin.H{
+		"person": input,
+	})
+}

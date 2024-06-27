@@ -24,6 +24,7 @@ func RunWebServer() {
 	apiRouter.GET("/rounds/:id", GetRound)
 	apiRouter.GET("/persons/", GetPersons)
 	apiRouter.GET("/persons/:id", GetPerson)
+	apiRouter.POST("/persons/", CreatePerson)
 
 	router.NoRoute(func(c *gin.Context) {
 		c.HTML(200, "index.tmpl", gin.H{
