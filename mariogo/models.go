@@ -81,7 +81,7 @@ type Character struct {
 
 type Person struct {
 	gorm.Model
-	Name        uint
+	Name        string
 	Character   *Character
 	CharacterID *uint
 }
