@@ -10,6 +10,5 @@ type Observer interface {
 	PlacementsChanged(old [4]int, new [4]int, roundTime time.Duration)
 	RoundFinished(player int, round int, time time.Duration, finished bool)
 	RoundResults(placements [4]int)
-	InterimResults(placements [4]int)
 	Abort(message string)
 }

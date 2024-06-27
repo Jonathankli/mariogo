@@ -27,8 +27,6 @@ func (l *Logger) StateChange(from int, to int) {
 		fmt.Println("Game paused")
 	} else if to == analyzer.RoundResults {
 		fmt.Println("Round results")
-	} else if to == analyzer.InterimResults {
-		fmt.Println("Interim results")
 	} else if to == analyzer.EndResults {
 		fmt.Println("Cup End")
 	}
@@ -48,10 +46,6 @@ func (l *Logger) NewRound(name string) {
 
 func (l *Logger) RoundResults(placements [4]int) {
 	fmt.Println("Round results: ", placements)
-}
-
-func (l *Logger) InterimResults(placements [4]int) {
-	fmt.Println("Interim results: ", placements)
 }
 
 func (l *Logger) Abort(message string) {

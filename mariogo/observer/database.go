@@ -10,11 +10,14 @@ import (
 )
 
 type Database struct {
-	game *mariogo.Game
+	game            *mariogo.Game
+	gameInitialized bool
 }
 
 func NewDatabase(player int) *Database {
-	return &Database{}
+	return &Database{
+		gameInitialized: false,
+	}
 }
 
 func (g *Database) updateGame() {
@@ -35,10 +38,11 @@ func (g *Database) Abort(message string) {
 	g.updateGame()
 }
 
-func (g *Database) Finish() {
-	g.game.Finished = true
-	mariogo.DB.Save(&g.game)
-	g.updateGame()
+func (d *Database) Finish() {
+	d.game.Finished = true
+	mariogo.DB.Save(&d.game)
+	d.game = nil
+	d.gameInitialized = false
 }
 
 func (g *Database) NewRound(trackName string) {
@@ -56,14 +60,14 @@ func (g *Database) RoundResults(placements [4]int) {
 
 	round := g.game.Rounds[len(g.game.Rounds)-1]
 
-	var roundPlacements []mariogo.RoundPlacement
+	var roundPlacements []mariogo.Placement
 
 	for i, position := range placements {
 		if position == 0 {
 			break
 		}
 		player := g.game.Players[i]
-		roundPlacement := mariogo.RoundPlacement{
+		roundPlacement := mariogo.Placement{
 			Round:    round,
 			PlayerID: player.ID,
 			Position: position,
@@ -75,39 +79,8 @@ func (g *Database) RoundResults(placements [4]int) {
 	g.updateGame()
 }
 
-func (g *Database) InterimResults(placements [4]int) {
-
-	if len(g.game.Placements) > 0 {
-		for i, placement := range g.game.Placements {
-			// TODO: make sur player is right player
-			placement.Position = placements[i]
-			mariogo.DB.Save(&placement)
-		}
-		g.updateGame()
-		return
-	}
-
-	var interimPlacements []mariogo.Placement
-
-	for i, position := range placements {
-		if position == 0 {
-			break
-		}
-		player := g.game.Players[i]
-		placement := mariogo.Placement{
-			GameID:   g.game.ID,
-			PlayerID: player.ID,
-			Position: position,
-		}
-		interimPlacements = append(interimPlacements, placement)
-	}
-
-	mariogo.DB.Create(&interimPlacements)
-	g.updateGame()
-}
-
 func (d *Database) PlayerCount(count int) {
-	if d.game == nil {
+	if !d.gameInitialized {
 		d.CreateGame()
 	}
 
@@ -139,17 +112,19 @@ func (d *Database) PlayerName(player int, name string) {
 
 func (d *Database) StateChange(from int, to int) {
 
-	if d.game == nil && to == analyzer.Racing {
+	if !d.gameInitialized && to == analyzer.Racing {
 		d.CreateGame()
 	}
 
-	if d.game != nil && to == analyzer.EndResults {
-		d.game = nil
+	if to == analyzer.EndResults {
+		d.Finish()
 	}
 
 }
 
 func (d *Database) CreateGame() {
+	d.gameInitialized = true
+
 	game := mariogo.Game{
 		Finished: false,
 	}
