@@ -32,6 +32,9 @@ func RunWebServer() {
 	apiRouter.GET("/characters", GetCharacters)
 	apiRouter.GET("/characters/:id", GetCharacter)
 	apiRouter.GET("/characters/:id/persons", GetPersonsByCharacter)
+	// apiRouter.GET("/tracks", GetTracks)
+	// apiRouter.GET("/tracks/:id", GetTrack)
+	// apiRouter.GET("/stats/leaderboard", GetLeaderboard)
 
 	router.NoRoute(func(c *gin.Context) {
 		c.HTML(200, "index.tmpl", gin.H{
