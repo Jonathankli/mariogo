@@ -22,6 +22,7 @@ func RunWebServer() {
 	apiRouter.GET("/games/:id", GetGame)
 	apiRouter.PATCH("/games/:game_id/:number_id/player", PatchPlayer)
 	apiRouter.PATCH("/games/current/:number_id/player", PatchCurrentPlayer)
+	apiRouter.PATCH("/games/last/:number_id/player", PatchLastPlayer)
 	apiRouter.GET("/rounds/:id", GetRound)
 	apiRouter.GET("/persons/", GetPersons)
 	apiRouter.GET("/persons/:id", GetPerson)
