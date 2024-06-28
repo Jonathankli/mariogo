@@ -11,13 +11,12 @@ import (
 )
 
 const (
-	Idle           = iota
-	Loading        = iota
-	Racing         = iota
-	Pause          = iota
-	RoundResults   = iota
-	InterimResults = iota
-	EndResults     = iota
+	Idle         = iota
+	Loading      = iota
+	Racing       = iota
+	Pause        = iota
+	RoundResults = iota
+	EndResults   = iota
 )
 
 type GameAnalyzer struct {
@@ -145,32 +144,9 @@ func (ga *GameAnalyzer) updateState() {
 				o.RoundResults(placements)
 			})
 		}
-	case RoundResults: // -> inertimResult | racing
+	case RoundResults: // -> endResults | racing
 
 		// New round name
-		if ga.nextRoundName == "" && ga.capture.Matches(pixel.IntroPage) {
-			ga.getRoundName()
-		}
-		// new round
-		if ga.isRacing() {
-			newState = Racing
-			ga.currentRound++
-			roundName := ga.getNextRoundName()
-			ga.NotifyObservers(func(o mariogo.Observer) {
-				o.NewRound(roundName)
-			})
-		}
-
-		// interim results
-		if results, ok := ga.getInterimResults(); ok {
-			newState = InterimResults
-			ga.NotifyObservers(func(o mariogo.Observer) {
-				o.InterimResults(results)
-			})
-		}
-
-	case InterimResults: // -> racing | endResults
-
 		if ga.nextRoundName == "" && ga.capture.Matches(pixel.IntroPage) {
 			ga.getRoundName()
 		}

@@ -27,8 +27,6 @@ func (l *Logger) StateChange(from int, to int) {
 		fmt.Println("Game paused")
 	} else if to == analyzer.RoundResults {
 		fmt.Println("Round results")
-	} else if to == analyzer.InterimResults {
-		fmt.Println("Interim results")
 	} else if to == analyzer.EndResults {
 		fmt.Println("Cup End")
 	}
@@ -50,19 +48,16 @@ func (l *Logger) RoundResults(placements [4]int) {
 	fmt.Println("Round results: ", placements)
 }
 
-func (l *Logger) InterimResults(placements [4]int) {
-	fmt.Println("Interim results: ", placements)
-}
-
 func (l *Logger) Abort(message string) {
 	fmt.Println("Game aborted: ", message)
 }
 
-func (l *Logger) RoundFinished(player int, round int, time time.Duration, finished bool) {
+func (l *Logger) RoundFinished(player int, round int, time time.Duration) {
 	fmt.Println("Player", player, "finished round", round, "in", time)
-	if finished {
-		fmt.Println("Player", player, "finished")
-	}
+}
+
+func (l *Logger) PlayerFinishedRace(player int, time time.Duration) {
+	fmt.Println("Player", player, "finished in", time)
 }
 
 func (l *Logger) PlacementsChanged(old [4]int, new [4]int, roundTime time.Duration) {

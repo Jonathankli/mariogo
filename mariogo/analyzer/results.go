@@ -101,22 +101,6 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 	return placements, ok
 }
 
-func (ga *GameAnalyzer) getInterimResults() ([4]int, bool) {
-
-	if ga.playerCount == 1 {
-		position, ok := ga.getInterimResultOnePlayer()
-		return [4]int{position, 0, 0, 0}, ok
-	}
-
-	results, ok := ga.GetRoundResult()
-
-	if ok {
-		ok = ga.capture.Matches(pixel.NeutralResultP1) || ga.capture.Matches(pixel.PositiveResultP1) || ga.capture.Matches(pixel.NegativeResultP1)
-	}
-
-	return results, ok
-}
-
 func (ga *GameAnalyzer) getPayerName(player int, xOffset int, yOffset int) {
 	text, err := ga.capture.OCR(470+xOffset, 60+yOffset, 795+xOffset, 90+yOffset)
 	fmt.Println("Player name:", text)

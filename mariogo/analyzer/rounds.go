@@ -67,16 +67,21 @@ func (ga *GameAnalyzer) AnalyzeRounds() {
 		if newRound != ga.playerRounds[i] || done {
 			if newRound > 1 || done {
 				roundTime := now.Sub(ga.playerRoundTimes[i])
+				sub := time.Duration(0)
 				if newRound == 2 && ga.exactStartFound {
-					roundTime = roundTime - 4*time.Second // TODO: Find exact time
+					sub += 4 * time.Second // TODO: Find exact time
 				}
 				if done {
-					roundTime = roundTime - 1*time.Second // TODO: Find exact time
+					sub += 1 * time.Second // TODO: Find exact time
 				}
+				roundTime -= sub
 
 				finishedRound := ga.playerRounds[i]
 				ga.NotifyObservers(func(o mariogo.Observer) {
-					o.RoundFinished(i+1, finishedRound, roundTime, done)
+					o.RoundFinished(i+1, finishedRound, roundTime)
+					if done {
+						o.PlayerFinishedRace(i+1, now.Sub(ga.roundStartedAt)-sub)
+					}
 				})
 
 				if done {

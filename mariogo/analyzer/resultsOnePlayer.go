@@ -41,19 +41,3 @@ func (ga *GameAnalyzer) GetRoundResultOnePlayer() (int, bool) {
 
 	return placement, ok
 }
-
-func (ga *GameAnalyzer) getInterimResultOnePlayer() (int, bool) {
-	result, ok := ga.GetRoundResultOnePlayer()
-
-	if ok {
-		xOffset := 360
-
-		neutral := pixel.AddOffset(pixel.NeutralResultP1, xOffset, 0)
-		positive := pixel.AddOffset(pixel.PositiveResultP1, xOffset, 0)
-		negative := pixel.AddOffset(pixel.NegativeResultP1, xOffset, 0)
-
-		ok = ga.capture.Matches(neutral) || ga.capture.Matches(positive) || ga.capture.Matches(negative)
-	}
-
-	return result, ok
-}
