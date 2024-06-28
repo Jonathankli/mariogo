@@ -1,0 +1,286 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "Mariogo",
+    "collectionId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+    "dateExported": "2024-06-28T13:59:55.064Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "7aff9dd3-a25d-4699-8cc9-e1a1dc105439",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET all games",
+            "url": "http://localhost:8888/api/games",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2024-06-28T13:39:03.150Z",
+            "modified": "2024-06-28T13:39:03.150Z",
+            "headers": []
+        },
+        {
+            "_id": "074477b7-5d7d-4863-b135-3ed9da2df406",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET Game with id 1",
+            "url": "http://localhost:8888/api/games/1",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2024-06-28T13:39:37.450Z",
+            "modified": "2024-06-28T13:39:37.450Z",
+            "headers": []
+        },
+        {
+            "_id": "a732e848-4c23-4fe0-ba9b-8e2f42f1b592",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET current game",
+            "url": "http://localhost:8888/api/games/current",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2024-06-28T13:40:01.881Z",
+            "modified": "2024-06-28T13:40:01.881Z",
+            "headers": []
+        },
+        {
+            "_id": "247a1fc8-7d86-49fe-8fe4-cddafee9e685",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET last game",
+            "url": "http://localhost:8888/api/games/last",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2024-06-28T13:40:19.897Z",
+            "modified": "2024-06-28T13:40:19.897Z",
+            "headers": []
+        },
+        {
+            "_id": "5d05467a-c4de-4fed-b72e-4cda31b96c4b",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "PATCH player in game",
+            "url": "http://localhost:8888/api/games/1/1/player",
+            "method": "PATCH",
+            "sortNum": 50000,
+            "created": "2024-06-28T13:42:51.499Z",
+            "modified": "2024-06-28T13:42:51.499Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{ \"fallback_name\": \"tanuki\", \"character_id\": 1, \"person_id\": 1 }",
+                "form": []
+            }
+        },
+        {
+            "_id": "b6741910-9d1f-411b-aaa0-25c83a1045e3",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "PATCH player in current game",
+            "url": "http://localhost:8888/api/games/current/1/player",
+            "method": "PATCH",
+            "sortNum": 60000,
+            "created": "2024-06-28T13:43:30.889Z",
+            "modified": "2024-06-28T13:43:30.889Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{ \"fallback_name\": \"tanuki\", \"character_id\": 1, \"person_id\": 1 }",
+                "form": []
+            }
+        },
+        {
+            "_id": "43d07eca-65c3-4354-82f6-42c7cbcfa673",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "PATCH player in last game",
+            "url": "http://localhost:8888/api/games/last/1/player",
+            "method": "PATCH",
+            "sortNum": 70000,
+            "created": "2024-06-28T13:43:52.223Z",
+            "modified": "2024-06-28T13:43:52.223Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{ \"fallback_name\": \"tanuki\", \"character_id\": 1, \"person_id\": 1 }",
+                "form": []
+            }
+        },
+        {
+            "_id": "a7459093-93d7-4628-9808-e404b2ee51fa",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET specific round",
+            "url": "http://localhost:8888/api/rounds/1",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2024-06-28T13:44:56.324Z",
+            "modified": "2024-06-28T13:44:56.324Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ]
+        },
+        {
+            "_id": "d88865b9-596e-4f3b-a2b9-e861cc0ba611",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET persons",
+            "url": "http://localhost:8888/api/persons",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2024-06-28T13:45:22.601Z",
+            "modified": "2024-06-28T13:45:22.601Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ]
+        },
+        {
+            "_id": "4b7cba6f-c42e-42f0-a7f9-110472fea7ce",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET specific person",
+            "url": "http://localhost:8888/api/persons/1",
+            "method": "GET",
+            "sortNum": 100000,
+            "created": "2024-06-28T13:45:49.866Z",
+            "modified": "2024-06-28T13:45:49.866Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ]
+        },
+        {
+            "_id": "bb359196-aa4e-4bfb-bdea-8468ae5615f0",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "Create Person (Character has to exist)",
+            "url": "http://localhost:8888/api/persons",
+            "method": "POST",
+            "sortNum": 110000,
+            "created": "2024-06-28T13:49:56.168Z",
+            "modified": "2024-06-28T13:49:56.168Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"Julian\",\n  \"CharacterID\" : 5\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "12ab6adf-788b-4af7-83f9-4f49a4a9ae97",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "PATCH person",
+            "url": "http://localhost:8888/api/persons/1",
+            "method": "PATCH",
+            "sortNum": 120000,
+            "created": "2024-06-28T13:51:15.093Z",
+            "modified": "2024-06-28T13:51:15.093Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"Cedric\",\n  \"CharacterID\" : 1\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "13c29f9a-8d89-4f03-9866-4800419b9d05",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET characters",
+            "url": "http://localhost:8888/api/characters",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2024-06-28T13:58:31.665Z",
+            "modified": "2024-06-28T13:58:31.666Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"Cedric\",\n  \"CharacterID\" : 1\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "fe749bc8-9d60-4a1d-96b5-63027009130f",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET character by id",
+            "url": "http://localhost:8888/api/characters/1",
+            "method": "GET",
+            "sortNum": 140000,
+            "created": "2024-06-28T13:58:53.729Z",
+            "modified": "2024-06-28T13:58:53.729Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"Cedric\",\n  \"CharacterID\" : 1\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "0ec4348c-dec5-42e0-b027-5f7e9cc07a6b",
+            "colId": "2d8baee8-95b1-40f1-9889-32c00a34bb57",
+            "containerId": "",
+            "name": "GET persons by character",
+            "url": "http://localhost:8888/api/characters/1/persons",
+            "method": "GET",
+            "sortNum": 150000,
+            "created": "2024-06-28T13:59:18.791Z",
+            "modified": "2024-06-28T13:59:18.791Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"Cedric\",\n  \"CharacterID\" : 1\n}",
+                "form": []
+            }
+        }
+    ],
+    "ref": "W9gxHoehkuypkSC9pG41p4Tw6gUgkyfnf91gWkXidX5oXHlAcWDY-fWefiVFoQ5zOd93iGidLEWwUU5QhcUbsA"
+}

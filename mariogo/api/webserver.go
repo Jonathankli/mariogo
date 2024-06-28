@@ -38,6 +38,6 @@ func RunWebServer() {
 			"test": "test",
 		})
 	})
-	router.Run(":8888") // for localhost only
-	// router.Run("0.0.0.0:8888") // for internal availability
+	// router.Run(":8888") // for localhost only
+	router.Run("0.0.0.0:8888") // for internal availability
 }
