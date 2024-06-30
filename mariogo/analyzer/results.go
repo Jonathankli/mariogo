@@ -35,26 +35,26 @@ func LoadResultHashes() {
 	resultPlusHashDark = darkhash
 }
 
-func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
+func (ga *GameAnalyzer) GetRoundResult() ([]mariogo.PlayerPlacement, bool) {
 	LoadResultHashes()
 	if ga.playerCount == 1 {
-		position, ok := ga.GetRoundResultOnePlayer()
-		return [4]int{position, 0, 0, 0}, ok
+		placement, ok := ga.GetRoundResultOnePlayer()
+		return []mariogo.PlayerPlacement{placement}, ok
 	}
 
-	placements := [4]int{0, 0, 0, 0}
+	var placements []mariogo.PlayerPlacement
 	foundPlayer := 0
+	foundBots := 0
+	botCount := 12 - ga.playerCount
 
 	rowDistance := 52
 	p1 := pixel.Pixel{X: 810, Y: 66}
 	p2 := pixel.Pixel{X: 828, Y: 85}
 
+	// loop over every row
 	for i := 0; i < 12; i++ {
 
-		if foundPlayer == ga.playerCount {
-			break
-		}
-
+		// get crop of the plus and convert to grayscale
 		croppedMat := ga.capture.Frame.Region(image.Rect(p1.X, p1.Y, p2.X, p2.Y))
 		grayMat := gocv.NewMat()
 		gocv.CvtColor(croppedMat, &grayMat, gocv.ColorBGRToGray)
@@ -62,9 +62,12 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 		grayMat.Close()
 		hash, _ := goimagehash.PerceptionHash(croppedImg)
 
+		// compare hash with the result plus hash
 		dist, _ := hash.Distance(resultPlusHash)
 		distDark, _ := hash.Distance(resultPlusHashDark)
 
+		rowIAPlayer := false
+		// if images are similar the plus we found a player
 		if dist < 18 || distDark < 18 {
 			for p := 0; p < ga.playerCount; p++ {
 				vec := croppedMat.GetVecbAt(0, 0)
@@ -74,26 +77,42 @@ func (ga *GameAnalyzer) GetRoundResult() ([4]int, bool) {
 				dist, err := ga.capture.ColorDistance(color, playerColor)
 
 				if dist < 0.16 && err == nil {
-					placements[p] = i + 1
+					placements = append(placements, mariogo.PlayerPlacement{Position: i + 1, IsBot: false, PlayerNumber: p + 1})
 					foundPlayer++
+					rowIAPlayer = true
 					break
 				}
 			}
-
 		}
 		p1.Y = p1.Y + rowDistance
 		p2.Y = p2.Y + rowDistance
 
+		if rowIAPlayer {
+			continue
+		}
+
+		// find bots
+		pixels := pixel.AddOffset(pixel.BotPlusP1, 0, i*rowDistance)
+		if ga.capture.Matches(pixels) {
+			icon := pixel.AddOffset(pixel.CharacterThumbnailP1, 0, i*rowDistance)
+			croppedMat := ga.capture.Crop(icon[0].X, icon[0].Y, icon[1].X, icon[1].Y)
+			croppedImg, _ := croppedMat.ToImage()
+			croppedMat.Close()
+			hash, _ := goimagehash.PerceptionHash(croppedImg)
+			placements = append(placements, mariogo.PlayerPlacement{Position: i + 1, IsBot: true, IconHash: hash})
+			foundBots++
+		}
+
 	}
 
-	ok := foundPlayer == ga.playerCount
+	ok := foundPlayer == ga.playerCount && foundBots == botCount
 
 	// Extract player names
 	if ok {
-		for p := 0; p < ga.playerCount; p++ {
-			if !ga.playerNamesRegistered[p] {
-				ga.getPayerName(p+1, 0, (placements[p]-1)*rowDistance)
-				ga.playerNamesRegistered[p] = true
+		for _, p := range placements {
+			if !p.IsBot && !ga.playerNamesRegistered[p.PlayerNumber-1] {
+				ga.getPayerName(p.PlayerNumber, 0, (p.Position-1)*rowDistance)
+				ga.playerNamesRegistered[p.PlayerNumber-1] = true
 			}
 		}
 	}

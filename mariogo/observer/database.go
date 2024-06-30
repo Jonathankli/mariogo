@@ -6,17 +6,20 @@ import (
 	"jkli/mariogo/mariogo/analyzer"
 	"time"
 
+	"github.com/corona10/goimagehash"
 	"gorm.io/gorm/clause"
 )
 
 type Database struct {
 	game            *mariogo.Game
 	gameInitialized bool
+	botHashMap      map[*goimagehash.ImageHash]uint
 }
 
-func NewDatabase(player int) *Database {
+func NewDatabase() *Database {
 	return &Database{
 		gameInitialized: false,
+		botHashMap:      make(map[*goimagehash.ImageHash]uint),
 	}
 }
 
@@ -56,21 +59,22 @@ func (g *Database) NewRound(trackName string) {
 	g.updateGame()
 }
 
-func (g *Database) RoundResults(placements [4]int) {
-
+func (g *Database) RoundResults(placements []mariogo.PlayerPlacement) {
 	round := g.game.Rounds[len(g.game.Rounds)-1]
 
 	var roundPlacements []mariogo.Placement
 
-	for i, position := range placements {
-		if position == 0 {
-			break
+	for _, placement := range placements {
+		var player *mariogo.Player
+		if placement.IsBot {
+			player = g.GetBotByHash(placement.IconHash)
+		} else {
+			player = g.game.GetPlayerByNumber(placement.PlayerNumber)
 		}
-		player := g.game.Players[i]
 		roundPlacement := mariogo.Placement{
 			Round:    round,
 			PlayerID: player.ID,
-			Position: position,
+			Position: placement.Position,
 		}
 		roundPlacements = append(roundPlacements, roundPlacement)
 	}
@@ -135,7 +139,7 @@ func (d *Database) CreateGame() {
 
 func (d *Database) RoundFinished(player int, round int, time time.Duration) {
 
-	playerModel := d.game.GetPlayerByPosition(player)
+	playerModel := d.game.GetPlayerByNumber(player)
 	roundModel := d.game.GetCurrentRound()
 
 	if roundModel == nil || playerModel == nil {
@@ -196,4 +200,35 @@ func (d *Database) PlacementsChanged(old [4]int, new [4]int, roundTime time.Dura
 	mariogo.DB.Create(&log)
 
 	d.updateGame()
+}
+
+func (d *Database) GetBotByHash(hash *goimagehash.ImageHash) *mariogo.Player {
+	id := uint(0)
+	for key, value := range d.botHashMap {
+		if dist, err := key.Distance(hash); dist <= 10 && err == nil {
+			id = value
+			break
+		}
+	}
+	if id == 0 && len(d.game.Players) == 12 {
+		return nil
+	}
+	if id == 0 {
+		player := mariogo.Player{
+			GameID: d.game.ID,
+			IsBot:  true,
+		}
+		mariogo.DB.Create(&player)
+		d.botHashMap[hash] = player.ID
+		d.game.Players = append(d.game.Players, player)
+		return &player
+	}
+
+	for _, player := range d.game.Players {
+		if player.ID == id {
+			return &player
+		}
+	}
+
+	return nil
 }

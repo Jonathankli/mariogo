@@ -22,7 +22,7 @@ func main() {
 
 	ga := analyzer.NewGameAnalyzer()
 	ga.AddObserver(&observer.Logger{})
-	ga.AddObserver(&observer.Database{})
+	ga.AddObserver(observer.NewDatabase())
 	ga.Run()
 
 }

@@ -12,12 +12,12 @@ type Pixel struct {
 }
 
 func AddOffset(pixels []Pixel, x int, y int) []Pixel {
+	pixelWithOffset := make([]Pixel, len(pixels))
 	for i := range pixels {
-		pixels[i].X += x
-		pixels[i].Y += y
+		pixelWithOffset[i] = Pixel{X: pixels[i].X + x, Y: pixels[i].Y + y, C: pixels[i].C}
 	}
 
-	return pixels
+	return pixelWithOffset
 }
 
 func GetRelativePixels(ref Pixel, convert []Pixel) []Pixel {

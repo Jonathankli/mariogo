@@ -49,3 +49,19 @@ var EndResults = []Pixel{
 	{X: 722, Y: 85, C: color.RGBA{204, 1, 0, 255}},
 	{X: 694, Y: 120, C: color.RGBA{167, 1, 0, 255}},
 }
+
+var BotPlusP1 = []Pixel{
+	{X: 818, Y: 68, C: color.RGBA{231, 224, 223, 255}},
+	{X: 819, Y: 71, C: color.RGBA{231, 226, 220, 255}},
+	{X: 815, Y: 75, C: color.RGBA{238, 231, 229, 255}},
+	{X: 813, Y: 75, C: color.RGBA{238, 231, 241, 255}},
+	{X: 818, Y: 78, C: color.RGBA{233, 226, 222, 255}},
+	{X: 819, Y: 81, C: color.RGBA{236, 234, 235, 255}},
+	{X: 822, Y: 75, C: color.RGBA{230, 232, 239, 255}},
+	{X: 824, Y: 75, C: color.RGBA{239, 233, 230, 255}},
+}
+
+var CharacterThumbnailP1 = []Pixel{
+	{X: 430, Y: 65},
+	{X: 445, Y: 90},
+}

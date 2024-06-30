@@ -59,6 +59,7 @@ type Player struct {
 	Number       int
 	Game         Game `json:"-"`
 	GameID       uint
+	IsBot        bool `gorm:"default:0"`
 	FallbackName *string
 	Character    *Character
 	CharacterID  *uint
@@ -81,7 +82,7 @@ type Person struct {
 	CharacterID *uint
 }
 
-func (g *Game) GetPlayerByPosition(position int) *Player {
+func (g *Game) GetPlayerByNumber(position int) *Player {
 	for _, player := range g.Players {
 		if player.Number == position {
 			return &player

@@ -2,6 +2,7 @@ package observer
 
 import (
 	"fmt"
+	"jkli/mariogo/mariogo"
 	"jkli/mariogo/mariogo/analyzer"
 	"time"
 )
@@ -44,8 +45,12 @@ func (l *Logger) NewRound(name string) {
 	fmt.Println("New round: ", name)
 }
 
-func (l *Logger) RoundResults(placements [4]int) {
-	fmt.Println("Round results: ", placements)
+func (l *Logger) RoundResults(placements []mariogo.PlayerPlacement) {
+	for _, placement := range placements {
+		if !placement.IsBot {
+			fmt.Println("Player", placement.PlayerNumber, "finished in", placement.Position, "position")
+		}
+	}
 }
 
 func (l *Logger) Abort(message string) {
