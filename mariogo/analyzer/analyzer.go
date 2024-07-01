@@ -38,6 +38,7 @@ type GameAnalyzer struct {
 	enableDebugTimes      bool
 	maxFPS                int
 	roundStartedAt        time.Time
+	keepStateChangeImages bool
 }
 
 func NewGameAnalyzer() *GameAnalyzer {
@@ -53,10 +54,11 @@ func NewGameAnalyzer() *GameAnalyzer {
 	}
 
 	ga := &GameAnalyzer{
-		capture:           mariogo.NewCapture(),
-		enableDebugImages: os.Getenv("DEBUG_IMAGES") == "true",
-		enableDebugTimes:  os.Getenv("DEBUG_TIMES") == "true",
-		maxFPS:            fps,
+		capture:               mariogo.NewCapture(),
+		enableDebugImages:     os.Getenv("DEBUG_IMAGES") == "true",
+		enableDebugTimes:      os.Getenv("DEBUG_TIMES") == "true",
+		keepStateChangeImages: os.Getenv("KEEP_STATE_CHANGE_IMAGES") == "true",
+		maxFPS:                fps,
 	}
 
 	ga.DefaultState()
@@ -221,8 +223,12 @@ func (ga *GameAnalyzer) updateState() {
 		ga.NotifyObservers(func(o mariogo.Observer) {
 			o.StateChange(ga.state, newState)
 		})
-		gocv.IMWrite(fmt.Sprintf("images/stateChanges/%v_%v-%v.png", time.Now().Format("20060102150405"), ga.state, newState), *ga.capture.Frame)
-		ga.state = newState
+
 		ga.stateUpdatedAt = time.Now()
+		ga.state = newState
+
+		if ga.keepStateChangeImages {
+			go gocv.IMWrite(fmt.Sprintf("images/stateChanges/%v_%v-%v.png", ga.stateUpdatedAt.Format("20060102150405"), ga.state, newState), *ga.capture.Frame)
+		}
 	}
 }
