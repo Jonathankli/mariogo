@@ -6,6 +6,7 @@ import (
 	"jkli/mariogo/mariogo/pixel"
 	"os"
 	"reflect"
+	"strconv"
 	"time"
 
 	"gocv.io/x/gocv"
@@ -13,7 +14,6 @@ import (
 
 const (
 	Idle         = iota
-	Loading      = iota
 	Racing       = iota
 	Pause        = iota
 	RoundResults = iota
@@ -41,19 +41,41 @@ type GameAnalyzer struct {
 }
 
 func NewGameAnalyzer() *GameAnalyzer {
-	return &GameAnalyzer{
-		state:                 Idle,
-		capture:               mariogo.NewCapture(),
-		playerCount:           0,
-		currentRound:          0,
-		running:               true,
-		playerNamesRegistered: [4]bool{false, false, false, false},
-		enableDebugImages:     os.Getenv("DEBUG_IMAGES") == "true",
-		enableDebugTimes:      os.Getenv("DEBUG_TIMES") == "true",
-		maxFPS:                30,
-		playerRounds:          [4]int{0, 0, 0, 0},
-		placements:            [4]int{0, 0, 0, 0},
+	// Load and generate hashes
+	GeneratePlacmentHashes()
+	LoadResultHashes()
+
+	fps, err := strconv.Atoi(mariogo.Getenv("MAX_FPS", "30"))
+
+	if err != nil {
+		fmt.Println("Error parsing MAX_FPS")
+		fps = 30
 	}
+
+	ga := &GameAnalyzer{
+		capture:           mariogo.NewCapture(),
+		enableDebugImages: os.Getenv("DEBUG_IMAGES") == "true",
+		enableDebugTimes:  os.Getenv("DEBUG_TIMES") == "true",
+		maxFPS:            fps,
+	}
+
+	ga.DefaultState()
+
+	return ga
+}
+
+func (ga *GameAnalyzer) DefaultState() {
+	ga.state = Idle
+	ga.stateUpdatedAt = time.Now()
+	ga.currentRound = 0
+	ga.playerCount = 0
+	ga.nextRoundName = ""
+	ga.playerNamesRegistered = [4]bool{false, false, false, false}
+	ga.playerRounds = [4]int{0, 0, 0, 0}
+	ga.placements = [4]int{0, 0, 0, 0}
+	ga.playerRoundTimes = [4]time.Time{}
+	ga.exactStartFound = false
+	ga.running = true
 }
 
 func (ga *GameAnalyzer) AddObserver(o mariogo.Observer) {
@@ -98,10 +120,6 @@ func (ga *GameAnalyzer) Run() {
 
 	// recover from panics
 	defer ga.recover()
-
-	// Load and generate hashes
-	GeneratePlacmentHashes()
-	LoadResultHashes()
 
 	fmt.Println("Start game gokart")
 	frame := 0
@@ -151,8 +169,6 @@ func (ga *GameAnalyzer) updateState() {
 				o.NewRound(roundName)
 			})
 		}
-	case Loading:
-		// TODO
 	case Racing: // -> pause
 		if !ga.isRacing() {
 			newState = Pause
@@ -196,11 +212,9 @@ func (ga *GameAnalyzer) updateState() {
 		}
 
 	case EndResults:
-		// TODO
+		// TODO: do something
 		newState = Idle
-		ga.NotifyObservers(func(o mariogo.Observer) {
-			o.StateChange(ga.state, newState)
-		})
+		ga.DefaultState()
 	}
 
 	if newState != ga.state {

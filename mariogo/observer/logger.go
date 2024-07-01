@@ -16,8 +16,6 @@ func (l *Logger) StateChange(from int, to int) {
 
 	if to == analyzer.Idle {
 		fmt.Println("Game is idle")
-	} else if to == analyzer.Loading {
-		fmt.Println("Game loading")
 	} else if to == analyzer.Racing {
 		if from == analyzer.Pause {
 			fmt.Println("Game resumed")
