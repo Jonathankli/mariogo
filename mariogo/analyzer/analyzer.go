@@ -5,6 +5,7 @@ import (
 	"jkli/mariogo/mariogo"
 	"jkli/mariogo/mariogo/pixel"
 	"os"
+	"reflect"
 	"time"
 
 	"gocv.io/x/gocv"
@@ -61,7 +62,13 @@ func (ga *GameAnalyzer) AddObserver(o mariogo.Observer) {
 
 func (ga *GameAnalyzer) NotifyObservers(callback func(mariogo.Observer)) {
 	for _, o := range ga.observers {
-		go callback(o)
+		go func(o mariogo.Observer) {
+			// Recover from observer panics
+			defer ga.catchObserverError(o)
+
+			// Call observer
+			callback(o)
+		}(o)
 	}
 }
 
@@ -70,10 +77,33 @@ func (ga *GameAnalyzer) Stop() {
 	defer ga.capture.Stop()
 }
 
+func (ga *GameAnalyzer) catchObserverError(o mariogo.Observer) {
+	if r := recover(); r != nil {
+		t := reflect.TypeOf(o)
+		fmt.Println("Observer error in:", t)
+		// TODO: log error to file
+	}
+}
+
+func (ga *GameAnalyzer) recover() {
+	if r := recover(); r != nil {
+		fmt.Println("GameAnalyzer error")
+		// TODO: log error to file
+		time.Sleep(time.Millisecond * 500)
+		ga.Run() //rerun game analyzer
+	}
+}
+
 func (ga *GameAnalyzer) Run() {
+
+	// recover from panics
+	defer ga.recover()
+
+	// Load and generate hashes
 	GeneratePlacmentHashes()
 	LoadResultHashes()
-	fmt.Println("Start game analyzer")
+
+	fmt.Println("Start game gokart")
 	frame := 0
 	for ga.running {
 		startTime := time.Now()
@@ -88,7 +118,7 @@ func (ga *GameAnalyzer) Run() {
 
 		took := time.Since(startTime)
 		if ga.enableDebugTimes {
-			fmt.Println("Time: ", took)
+			fmt.Println("Time:", took)
 		}
 
 		if took < time.Second/time.Duration(ga.maxFPS) {
