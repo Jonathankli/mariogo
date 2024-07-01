@@ -21,7 +21,7 @@ type Round struct {
 	Placements          []Placement
 	PlacementChangeLogs []PlacementChangeLog
 	Game                Game `json:"-"`
-	GameID              *uint
+	GameID              uint
 }
 
 type PlacementChangeLog struct {

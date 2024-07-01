@@ -24,7 +24,7 @@ func NewDatabase() *Database {
 }
 
 func (g *Database) updateGame() {
-	mariogo.DB.Preload(clause.Associations).Preload("Players.Person.DefaultCharacter").First(&g.game)
+	mariogo.DB.Preload(clause.Associations).Preload("Players.Person.DefaultCharacter").Where("id = ?", g.game.ID).First(&g.game)
 }
 
 func (g *Database) Abort(message string) {
@@ -52,7 +52,7 @@ func (g *Database) NewRound(trackName string) {
 	round := mariogo.Round{
 		Index:     len(g.game.Rounds) + 1,
 		TrackName: trackName,
-		Game:      *g.game,
+		GameID:    g.game.ID,
 	}
 
 	mariogo.DB.Create(&round)
@@ -129,12 +129,12 @@ func (d *Database) StateChange(from int, to int) {
 func (d *Database) CreateGame() {
 	d.gameInitialized = true
 
-	game := mariogo.Game{
+	d.game = &mariogo.Game{
 		Finished: false,
 	}
 
-	mariogo.DB.Create(&game)
-	mariogo.DB.First(&d.game)
+	mariogo.DB.Create(&d.game)
+	d.updateGame()
 }
 
 func (d *Database) RoundFinished(player int, round int, time time.Duration) {
